@@ -1,0 +1,95 @@
+<!-- Sidebar -->
+<ul class='navbar-nav sidebar sidebar-dark accordion' id='accordionSidebar'>
+
+    <!-- Sidebar - Brand -->
+    <a class='sidebar-brand d-flex align-items-center justify-content-center' href="{% url 'index' %}">
+        <div class='sidebar-brand-icon'>
+            <i class='fas fa-shopping-cart'></i>
+        </div>
+        <div class='sidebar-brand-text mx-3'>
+            Auctions
+        </div>
+    </a>
+
+    <!-- Divider -->
+    <hr class='sidebar-divider my-0'>
+
+    <!-- Nav Item - Dashboard -->
+    <li class='nav-item'>
+        <a class='nav-link' href="{% url 'dashboard' %}">
+            <i class='fas fa-fw fa-chart-area'></i>
+            <span>DASHBOARD</span>
+        </a>
+    </li>
+
+    <!-- Nav Item - Active Auctions -->
+    <li class='nav-item'>
+        <a class='nav-link' href="{% url 'active_auctions_view' %}">
+            <i class='fas fa-fw fa-list'></i>
+            <span>ACTIVE AUCTIONS</span>
+        </a>
+    </li>
+
+    {% if user.is_authenticated %}
+        <!-- Nav Item - Watchlist -->
+        <li class='nav-item'>
+            <a class='nav-link' href="{% url 'watchlist_view' %}">
+                <i class='fas fa-fw fa-eye'></i>
+                <span>WATCHLIST</span>
+            </a>
+        </li>
+
+        <!-- Nav Item - Create Auction -->
+        <li class='nav-item'>
+            <a class='nav-link' href="{% url 'auction_create' %}">
+                <i class='far fa-plus-square'></i>
+                <span>CREATE AUCTION</span>
+            </a>
+        </li>
+    {% endif %}
+
+    <!-- Divider -->
+    <hr class='sidebar-divider'>
+
+    <!-- Heading -->
+    <div class='sidebar-heading'>
+        Categories
+    </div>
+
+    {% for category in categories %}
+        <li class='nav-item'>
+            <a class='nav-link' href="{% url 'category_details_view' category.category_name %}">
+                <i class='fas fa-fw fa-folder-open'></i>
+                <span class='text-uppercase'>{{ category }}</span>
+                <span class='badge-custom'>
+                    {{ category.count_active_auctions }}
+                </span>
+            </a>
+        </li>
+    {% endfor %}
+
+    <!-- Divider -->
+    <hr class='sidebar-divider d-none d-md-block'>
+
+    <!-- Signed in user -->
+    <li class='nav-item'>
+        <div class='nav-link'>
+            {% if user.is_authenticated %}
+                <div class='sidebar-text-gray'>Signed in as:</div>
+                <div class='sidebar-text-white'>{{ user.username }}</div>
+            {% else %}
+                <div class='sidebar-text-gray'>Not signed in.</div>
+            {% endif %}
+        </div>
+    </li>
+
+    <!-- Divider -->
+    <hr class='sidebar-divider d-none d-md-block'>
+
+    <!-- Sidebar Toggler (Sidebar) -->
+    <div class='text-center d-none d-md-inline'>
+        <button class='rounded-circle border-0' id='sidebarToggle'></button>
+    </div>
+
+</ul>
+<!-- End of Sidebar -->

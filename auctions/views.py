@@ -1,4 +1,5 @@
 from decimal import Decimal
+
 from django import forms
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
@@ -8,14 +9,14 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
-from .models import Auction, Bid, Category, Image, User
 from .forms import AuctionForm, ImageForm, CommentForm, BidForm
+from .models import Auction, Bid, Category, Image, User
 
 
 def index(request):
-    '''
+    """
     The default route which renders a Dashboard page
-    '''
+    """
     auctions = Auction.objects.all()
 
     expensive_auctions = Auction.objects.order_by('-starting_bid')[:4]
@@ -35,6 +36,41 @@ def index(request):
         pages = paginator.page(paginator.num_pages)
 
     return render(request, 'index.html', {
+        'categories': Category.objects.all(),
+        'auctions': auctions,
+        'expensive_auctions': expensive_auctions,
+        'auctions_count': Auction.objects.all().count(),
+        'bids_count': Bid.objects.all().count(),
+        'categories_count': Category.objects.all().count(),
+        'users_count': User.objects.all().count(),
+        'pages': pages,
+        'title': 'Dashboard',
+    })
+
+
+def dashboard(request):
+    """
+    The default route which renders a Dashboard page
+    """
+    auctions = Auction.objects.all()
+
+    expensive_auctions = Auction.objects.order_by('-starting_bid')[:4]
+
+    for auction in auctions:
+        auction.image = auction.get_images.first()
+
+    # Show 5 auctions per page
+    page = request.GET.get('page', 1)
+    paginator = Paginator(auctions, 5)
+
+    try:
+        pages = paginator.page(page)
+    except PageNotAnInteger:
+        pages = paginator.page(1)
+    except EmptyPage:
+        pages = paginator.page(paginator.num_pages)
+
+    return render(request, 'dashboard.html', {
         'categories': Category.objects.all(),
         'auctions': auctions,
         'expensive_auctions': expensive_auctions,
@@ -113,9 +149,9 @@ def logout_view(request):
 
 @login_required
 def auction_create(request):
-    '''
+    """
     It allows the user to create a new auction
-    '''
+    """
     ImageFormSet = forms.modelformset_factory(Image, form=ImageForm, extra=2)
 
     if request.method == 'POST':
@@ -158,11 +194,11 @@ def auction_create(request):
 
 
 def active_auctions_view(request):
-    '''
+    """
     It renders a page that displays all of
     the currently active auction listings
     Active auctions are paginated: 3 per page
-    '''
+    """
     category_name = request.GET.get('category_name', None)
     if category_name is not None:
         auctions = Auction.objects.filter(active=True, category=category_name)
@@ -197,11 +233,11 @@ def active_auctions_view(request):
 
 @login_required
 def watchlist_view(request):
-    '''
+    """
     It renders a page that displays all of
     the listings that a user has added to their watchlist
     Auctions are paginated: 3 per page
-    '''
+    """
     auctions = request.user.watchlist.all()
 
     for auction in auctions:
@@ -233,10 +269,10 @@ def watchlist_view(request):
 
 @login_required
 def watchlist_edit(request, auction_id, reverse_method):
-    '''
+    """
     It allows the users to edit the watchlist -
     add and remove items from the Watchlist
-    '''
+    """
     auction = Auction.objects.get(id=auction_id)
 
     if request.user in auction.watchers.all():
@@ -251,9 +287,9 @@ def watchlist_edit(request, auction_id, reverse_method):
 
 
 def auction_details_view(request, auction_id):
-    '''
+    """
     It renders a page that displays the details of a selected auction
-    '''
+    """
     if not request.user.is_authenticated:
         return HttpResponseRedirect(reverse('login'))
 
@@ -277,9 +313,9 @@ def auction_details_view(request, auction_id):
 
 @login_required
 def auction_bid(request, auction_id):
-    '''
+    """
     It allows the signed in users to bid on the item
-    '''
+    """
     auction = Auction.objects.get(id=auction_id)
     amount = Decimal(request.POST['amount'])
 
@@ -305,11 +341,11 @@ def auction_bid(request, auction_id):
 
 
 def auction_close(request, auction_id):
-    '''
+    """
     It allows the signed in user who created the listing
     to “close” the auction, which makes the highest bidder
     the winner of the auction and makes the listing no longer active
-    '''
+    """
     auction = Auction.objects.get(id=auction_id)
 
     if request.user == auction.creator:
@@ -325,9 +361,9 @@ def auction_close(request, auction_id):
 
 
 def auction_comment(request, auction_id):
-    '''
+    """
     It allows the signed in users to add comments to the listing page
-    '''
+    """
     auction = Auction.objects.get(id=auction_id)
     form = CommentForm(request.POST)
     new_comment = form.save(commit=False)
@@ -338,11 +374,11 @@ def auction_comment(request, auction_id):
 
 
 def category_details_view(request, category_name):
-    '''
+    """
     Clicking on the name of any category takes the user to a page that
     displays all of the active listings in that category
     Auctions are paginated: 3 per page
-    '''
+    """
     category = Category.objects.get(category_name=category_name)
     auctions = Auction.objects.filter(category=category)
 

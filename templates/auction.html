@@ -3,31 +3,12 @@
 
 {% block title %}Auctions | {{ title }} {% endblock %}
 
-{% block categories %}
-    <!-- Divider -->
-    <hr class='sidebar-divider'>
-    
-    <!-- Heading -->
-    <div class='sidebar-heading'>
-        Categories
-    </div>
-
-    {% for category in categories %}
-        <li class='nav-item'>
-            <a class='nav-link' href="{% url 'category_details_view' category.category_name %}">
-                <i class='fas fa-fw fa-folder-open'></i>
-                <span class='text-uppercase'>{{ category }}</span>
-                <span class='badge-custom'>
-                    {{ category.count_active_auctions }}
-                </span>
-            </a>
-        </li>
-    {% endfor %}
-    
-{% endblock %}
-
 
 {% block body %}
+
+      {% include 'sidebar.html' %}
+
+    <div class="container">
     
     <!-- Page Heading -->
     <h1 class='h3 mb-4 text-gray-800'>{{ auction.title }}</h1>
@@ -319,5 +300,6 @@
                 </div>
             </div>
         </div>
+    </div>
 
 {% endblock %}

@@ -1,226 +1,184 @@
 {% extends 'base.html' %}
-
+{% load static %}
 {% block title %}Auctions | {{ title }} {% endblock %}
 
-{% block categories %}
-    <!-- Divider -->
-    <hr class='sidebar-divider'>
-    
-    <!-- Heading -->
-    <div class='sidebar-heading'>
-        Categories
-    </div>
-
-    {% for category in categories %}
-        <li class='nav-item'>
-            <a class='nav-link' href="{% url 'category_details_view' category.category_name %}">
-                <i class='fas fa-fw fa-folder-open'></i>
-                <span class='text-uppercase'>{{ category }}</span>
-                <span class='badge-custom'>
-                    {{ category.count_active_auctions }}
-                </span>
-            </a>
-        </li>
-    {% endfor %}
-    
+{% block links %}
+    <link href='{% static "css/index.css" %}' rel='stylesheet'>
+    <link href='https://fonts.googleapis.com/css?family=Montserrat' rel='stylesheet'>
 {% endblock %}
 
 
 {% block body %}
-    <!-- Page Heading -->
-    <h1 class='h3 mb-4 text-gray-800'>Dashboard</h1>
+    {#<header>#}
+    {#    <div class="logo">#}
+    {#        <img src="{% static "images/HealthcareAuctionsLogo_no_bg.png" %} " alt="Auction 1">#}
+    {#        HealthcareAuctions.com#}
+    {#    </div>#}
+    {#    <nav>#}
+    {#        <ul>#}
+    {#            <li><a href="#">Home</a></li>#}
+    {#            <li><a href="#">About</a></li>#}
+    {#            <li><a href="#">Services</a></li>#}
+    {#            <li><a href="/auction/active">Auctions</a></li>#}
+    {#            <li><a href="#">Contact</a></li>#}
+    {#            <li><a href="/register" class="button primary">Sign Up</a></li>#}
+    {#            <li><a href="/login" class="button secondary">Login</a></li>#}
+    {#        </ul>#}
+    {#    </nav>#}
+    {#</header>#}
 
-    <div class='row'>
-    
-        <div class='col-xl-3 col-md-6 mb-4'>
-            <div class='card border-left-blue shadow h-100 py-2'>
-                <div class='card-body'>
-                    <div class='row no-gutters align-items-center'>
-                        <div class='col mr-2'>
-                            <div class='text-xs font-weight-bold text-primary text-uppercase mb-1'>
-                                Auctions
-                            </div>
-                            <div class='h5 mb-0 font-weight-bold text-gray-800'>
-                                {{ auctions_count }}
-                            </div>
-                        </div>
-                        <div class='col-auto'>
-                            <i class='fas fa-shopping-cart fa-2x text-gray-300'></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <div class=container style="padding: 0;">
 
-        <div class='col-xl-3 col-md-6 mb-4'>
-            <div class='card border-left-orange shadow h-100 py-2'>
-                <div class='card-body'>
-                    <div class='row no-gutters align-items-center'>
-                        <div class='col mr-2'>
-                            <div class='text-xs font-weight-bold text-primary text-uppercase mb-1'>
-                                Bids
-                            </div>
-                            <div class='h5 mb-0 font-weight-bold text-gray-800'>
-                                {{ bids_count }}
-                            </div>
-                        </div>
-                        <div class='col-auto'>
-                            <i class='fas fa-hammer fa-2x text-gray-300'></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <section class="hero">
+            <h1>Welcome to Healthcare Auctions</h1>
+            <p>Your trusted platform for healthcare equipment and supplies.</p>
+            <a href="#" class="button primary">Explore Auctions</a>
+        </section>
 
-        <div class='col-xl-3 col-md-6 mb-4'>
-            <div class='card border-left-green shadow h-100 py-2'>
-                <div class='card-body'>
-                    <div class='row no-gutters align-items-center'>
-                        <div class='col mr-2'>
-                            <div class='text-xs font-weight-bold text-primary text-uppercase mb-1'>
-                                Categories
-                            </div>
-                            <div class='h5 mb-0 font-weight-bold text-gray-800'>
-                                {{ categories_count }}
-                            </div>
-                        </div>
-                        <div class='col-auto'>
-                            <i class='fas fa-folder-open fa-2x text-gray-300'></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <section class="featured-auctions">
+            <h2>Featured Auctions</h2>
+            <div class="grid">
 
-        <div class='col-xl-3 col-md-6 mb-4'>
-            <div class='card border-left-red shadow h-100 py-2'>
-                <div class='card-body'>
-                    <div class='row no-gutters align-items-center'>
-                        <div class='col mr-2'>
-                            <div class='text-xs font-weight-bold text-primary text-uppercase mb-1'>
-                                Users
-                            </div>
-                            <div class='h5 mb-0 font-weight-bold text-gray-800'>
-                                {{ users_count }}
-                            </div>
-                        </div>
-                        <div class='col-auto'>
-                            <i class='fas fa-users fa-2x text-gray-300'></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-    </div>
-
-    <div class='row'>
-        <div class='col-lg-6'>
-            <div class='card mb-4'>
-                <div class='card-header'>
-                    <i class='fas fa-chart-bar me-1'></i>
-                    Top Categories
-                </div>
-                <div class='card-body'>
-                    <canvas id='myBarChart' width='100%' height='50'></canvas>
-                </div>
-            </div>
-        </div>
-        <div class='col-lg-6'>
-            <div class='card mb-4'>
-                <div class='card-header'>
-                    <i class='fas fa-chart-pie me-1'></i>
-                    The Most Expensive Auction Items
-                </div>
-                <div class='card-body'>
-                    <canvas id='myPieChart' width='100%' height='50'></canvas>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class='card mb-4'>
-        <div class='card-header'>
-            <i class='fas fa-chart-area me-1'></i>
-            Auctions by Category
-        </div>
-        <div class='card-body'>
-            <canvas id='myAreaChart' width='100%' height='30'></canvas>
-        </div>
-    </div>
-
-    <div class='card mb-4'>
-        <div class='card-header'>
-            <i class='fas fa-table me-1'></i>
-            All Auctions
-        </div>
-        <div class='card-body'>
-        
-            <table class='table table-hover'>
-                <thead>
-                    <tr>
-                        <th scope='col'>Title</th>
-                        <th scope='col'>Category</th>
-                        <th scope='col'>Date Created</th>
-                        <th scope='col'>Starting Bid</th>
-                        <th scope='col'>Current Bid</th>
-                        <th scope='col'>Buyer</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for auction in pages %}
-                        <tr>
-                            <td>{{ auction.title }}</td>
-                            <td>{{ auction.category }}</td>
-                            <td>{{ auction.date_created }}</td>
-                            <td>{{ auction.starting_bid }}</td>
-                            <td>{{ auction.current_bid }}</td>
-                            <td>{{ auction.buyer }}</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-            
-            {% if pages.has_other_pages %}
-                <div class='d-flex justify-content-center'>
-                    <ul class='pagination'>
-                        {% if pages.has_previous %}
-                            <li class='page-item'>
-                                <a class='page-link' href='?page={{ pages.previous_page_number }}'>
-                                    &laquo;
-                                </a>
-                            </li>
+                {% for auction in pages %}
+                    <div class="auction-item">
+                        {% if auction.image %}
+                            <img src="{{ auction.image.image.url }}" alt="{{ auction.title }}">
                         {% else %}
-                            <li class='page-item disabled'>
-                                <a class='page-link' href='#'>&laquo;</a>
-                            </li>
+                            <img src="path/to/default/image.jpg" alt="Default Image">
                         {% endif %}
-                        {% for i in pages.paginator.page_range %}
-                            {% if pages.number == i %}
-                                <li class='page-item active'>
-                                    <a class='page-link' href='#'>{{ i }}</a>
-                                </li>
-                            {% else %}
-                                <li class='page-item'>
-                                    <a class='page-link' href='?page={{ i }}'>{{ i }}</a>
-                                </li>
-                            {% endif %}
-                        {% endfor %}
-                        {% if pages.has_next %}
-                            <li class='page-item'>
-                                <a class='page-link' href='?page={{ pages.next_page_number }}'>&raquo;</a>
-                            </li>
-                        {% else %}
-                            <li class='page-item disabled'>
-                                <a class='page-link' href='#'>&raquo;</a>
-                            </li>
-                        {% endif %}
-                    </ul>
+                        <h3>{{ auction.title }}</h3>
+                        <p>{{ auction.category }}</p>
+                        <h3>{{ auction.current_bid }}</h3>
+                    </div>
+
+                {% endfor %}
+
+
+                {#        <div class="auction-item">#}
+                {#            <img src="auction1.jpg" alt="Auction 1">#}
+                {#            <h3>Auction Title 1</h3>#}
+                {#            <p>Brief description of the auction.</p>#}
+                {#        </div>#}
+                {#        <div class="auction-item">#}
+                {#            <img src="auction2.jpg" alt="Auction 2">#}
+                {#            <h3>Auction Title 2</h3>#}
+                {#            <p>Brief description of the auction.</p>#}
+                {#        </div>#}
+                {#        <div class="auction-item">#}
+                {#            <img src="auction3.jpg" alt="Auction 3">#}
+                {#            <h3>Auction Title 3</h3>#}
+                {#            <p>Brief description of the auction.</p>#}
+                {#        </div>#}
+            </div>
+            <a href="#" class="button secondary">View All Auctions</a>
+        </section>
+
+        <section class="how-it-works">
+            <h2>How It Works</h2>
+            <div class="steps">
+                <div class="step">
+                    <i class="fas fa-user-plus"></i>
+                    <h3>Register</h3>
+                    <p>Sign up for a free account, it's easy.</p>
                 </div>
-            {% endif %}
-        
-        </div>
+                <div class="step">
+                    <i class="fas fa-search"></i>
+                    <h3>Browse</h3>
+                    <p>Explore the listings to find what you need.</p>
+                </div>
+                <div class="step">
+                    <i class="fas fa-gavel"></i>
+                    <h3>Bid</h3>
+                    <p>Bid on the items you want.</p>
+                </div>
+                <div class="step">
+                    <i class="fas fa-box-open"></i>
+                    <h3>Receive Items</h3>
+                    <p>Complete your purchase.</p>
+                </div>
+            </div>
+        </section>
+
+
+        <section class="why-choose-us">
+        <h2>Why Choose Healthcare Auctions</h2>
+        <ul>
+            <li>
+                <i class="fas fa-shield-alt"></i>
+                <div>
+                    <strong>Trusted Platform</strong>
+                    <p>We offer transaction insurance guaranteeing the product is as expected, or we will refund your money. This is a first for excess medical supplies auctions.</p>
+                </div>
+            </li>
+            <li>
+                <i class="fas fa-check-circle"></i>
+                <div>
+                    <strong>High-Quality Listings</strong>
+                    <p>All listings are thoroughly vetted to ensure they meet our high standards of quality and reliability.</p>
+                </div>
+            </li>
+            <li>
+                <i class="fas fa-lock"></i>
+                <div>
+                    <strong>Secure Transactions</strong>
+                    <p>Our platform uses advanced security measures to protect your transactions and personal information.</p>
+                </div>
+            </li>
+            <li>
+                <i class="fas fa-headset"></i>
+                <div>
+                    <strong>Excellent Support</strong>
+                    <p>Our dedicated support team is available to assist you with any questions you may have.</p>
+                </div>
+            </li>
+        </ul>
+    </section>
+
+
+        <section class="testimonials">
+            <h2>What Our Clients Say</h2>
+            <div class="carousel">
+                <div class="testimonial">
+                    <p>"Great platform for finding the best healthcare equipment!"</p>
+                    <span>- Client Name</span>
+                </div>
+                <div class="testimonial">
+                    <p>"Easy to use and reliable service."</p>
+                    <span>- Client Name</span>
+                </div>
+                <div class="testimonial">
+                    <p>"Highly recommend Healthcare Auctions for their excellent support."</p>
+                    <span>- Client Name</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="call-to-action">
+            <h2>Ready to Start Bidding?</h2>
+            <p>Join us today and find the best deals on healthcare equipment.</p>
+            <a href="#" class="button primary">Sign Up Now</a>
+        </section>
     </div>
-
-
 {% endblock %}
+
+{##}
+{#<footer>#}
+{#    <div class="quick-links">#}
+{#        <a href="#">Home</a>#}
+{#        <a href="#">About</a>#}
+{#        <a href="#">Services</a>#}
+{#        <a href="#">Auctions</a>#}
+{#        <a href="#">Contact</a>#}
+{#    </div>#}
+{#    <div class="contact-info">#}
+{#        <p>Address: 123 Healthcare St, City, Country</p>#}
+{#        <p>Phone: (123) 456-7890</p>#}
+{#        <p>Email: info@healthcareauctions.com</p>#}
+{#    </div>#}
+{#    <div class="social-media">#}
+{#        <a href="#" class="icon icon-facebook"></a>#}
+{#        <a href="#" class="icon icon-twitter"></a>#}
+{#        <a href="#" class="icon icon-linkedin"></a>#}
+{#    </div>#}
+{#</footer>#}
+
