@@ -948,3 +948,13 @@ body.sidebar-toggled footer.sticky-footer {
 button i {
     color: var(--white) !important;
 }
+
+#auction-create {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.img-container{
+    display: flex;
+}

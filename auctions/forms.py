@@ -7,9 +7,11 @@ class AuctionForm(forms.ModelForm):
     '''
     A ModelForm class for creating a new auction listing
     '''
+
     class Meta:
         model = Auction
-        fields = ['title', 'description', 'category', 'starting_bid']
+        fields = ['title', 'description', 'category', 'starting_bid', 'manufacturer', 'reference_number', 'lot_number',
+                  'expiration_date', 'package_type', 'package_quantity', 'deviceSterile']
 
     def __init__(self, *args, **kwargs):
         super(AuctionForm, self).__init__(*args, **kwargs)
@@ -21,6 +23,7 @@ class ImageForm(forms.ModelForm):
     '''
     A ModelForm class for adding an image to the auction
     '''
+
     class Meta:
         model = Image
         fields = ['image']
@@ -34,6 +37,7 @@ class CommentForm(forms.ModelForm):
     '''
     A ModelForm class for adding a new comment to the auction
     '''
+
     class Meta:
         model = Comment
         fields = ['comment']
@@ -54,6 +58,7 @@ class BidForm(forms.ModelForm):
     '''
     A ModelForm class for placing a bid
     '''
+
     class Meta:
         model = Bid
         fields = ['amount']

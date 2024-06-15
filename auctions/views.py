@@ -152,7 +152,7 @@ def auction_create(request):
     """
     It allows the user to create a new auction
     """
-    ImageFormSet = forms.modelformset_factory(Image, form=ImageForm, extra=2)
+    ImageFormSet = forms.modelformset_factory(Image, form=ImageForm, extra=5)
 
     if request.method == 'POST':
         auction_form = AuctionForm(request.POST, request.FILES)

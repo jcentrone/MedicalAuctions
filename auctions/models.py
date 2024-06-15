@@ -46,6 +46,22 @@ class Auction(models.Model):
     watchers = models.ManyToManyField(User, related_name='watchlist', blank=True)
     active = models.BooleanField(default=True)
 
+    manufacturer = models.CharField(max_length=100, null=True, blank=True)
+    reference_number = models.CharField(max_length=100, null=True, blank=True)
+    lot_number = models.CharField(max_length=100, null=True, blank=True)
+    expiration_date = models.DateField(null=True, blank=True)
+    package_type = models.CharField(max_length=100, null=True, blank=True)
+    package_quantity = models.IntegerField(null=True, blank=True)
+    gmdnPTDefinition = models.TextField(null=True, blank=True)
+    implantable = models.BooleanField(default=False)
+    productCode = models.CharField(max_length=100, null=True, blank=True)
+    productCodeName = models.CharField(max_length=100, null=True, blank=True)
+    deviceSterile = models.BooleanField(default=False)
+    sterilizationPriorToUse = models.BooleanField(default=False)
+    deviceClass = models.CharField(max_length=50, null=True, blank=True)
+    size_information = models.TextField(null=True, blank=True)
+    storage_handling = models.JSONField(null=True, blank=True)
+
     def __str__(self):
         return f'Auction #{self.id}: {self.title} ({self.creator})'
 
