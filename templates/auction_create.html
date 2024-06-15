@@ -2,14 +2,32 @@
 
 {% block title %}Auctions | {{ title }} {% endblock %}
 
-
-
-
 {% block body %}
-
     {% include 'sidebar.html' %}
 
+
+
     <div class="container">
+        <!-- Modal -->
+        <div id="optionModal" class="modal">
+            <div class="modal-content">
+                <h2>Select an Option</h2>
+                <div class="modal-options">
+                    <div class="option" id="scanBarcode">
+                        <i class="fa-solid fa-barcode"></i>
+                        <h3>Scan Barcode</h3>
+                    </div>
+                    <div class="option" id="enterDetails">
+                        <i class="fa-solid fa-pencil"></i>
+                        <h3>Enter Details Manually</h3>
+                    </div>
+                    <div class="option" id="importExcel">
+                        <i class="fa-solid fa-file-excel"></i>
+                        <h3>Import Excel</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
         <!-- Page Heading -->
         {% if success %}
             <br>
@@ -26,15 +44,108 @@
                         <form action="{% url 'auction_create' %}" method='POST' enctype='multipart/form-data'>
                             {% csrf_token %}
                             <div class='form-group' id="auction-create">
-                                
-                                {{ auction_form.as_div }}
-                                
+                                <div class="span-two">
+                                    {{ auction_form.title.label_tag }}
+                                    {{ auction_form.title }}
+                                </div>
+
+                                <div class="span-two">
+                                    {{ auction_form.description.label_tag }}
+                                    {{ auction_form.description }}
+                                </div>
+                                <div class="bid-details">
+                                    <div>
+                                        {{ auction_form.category.label_tag }}
+                                        {{ auction_form.category }}
+                                    </div>
+
+                                    <div>
+                                        {{ auction_form.starting_bid.label_tag }}
+                                        {{ auction_form.starting_bid }}
+                                    </div>
+                                    <div>
+                                        {{ auction_form.reserve_bid.label_tag }}
+                                        {{ auction_form.reserve_bid }}
+                                    </div>
+                                </div>
+
+                                <!-- Insert the heading here -->
+                                <h3 class="package-details-heading">Enter Package Details</h3>
+
+                                <div>
+                                    {{ auction_form.manufacturer.label_tag }}
+                                    {{ auction_form.manufacturer }}
+                                </div>
+
+                                <div>
+                                    {{ auction_form.reference_number.label_tag }}
+                                    {{ auction_form.reference_number }}
+                                </div>
+
+                                <div>
+                                    {{ auction_form.lot_number.label_tag }}
+                                    {{ auction_form.lot_number }}
+                                </div>
+
+                                <div>
+                                    {{ auction_form.expiration_date.label_tag }}
+                                    {{ auction_form.expiration_date }}
+                                </div>
+
+                                <div>
+                                    {{ auction_form.package_type.label_tag }}
+                                    {{ auction_form.package_type }}
+                                </div>
+
+                                <div>
+                                    {{ auction_form.package_quantity.label_tag }}
+                                    {{ auction_form.package_quantity }}
+                                </div>
+
+                                <div class="checkbox-row">
+                                    {{ auction_form.deviceSterile.label_tag }}
+                                    {{ auction_form.deviceSterile }}
+                                </div>
+                                <div class="checkbox-row">
+                                    {{ auction_form.fullPackage.label_tag }}
+                                    {{ auction_form.fullPackage }}
+                                </div>
+
                                 {{ image_form.management_form }}
-                                <div class=img-container>
-                                    {% for form in image_form %}
-                                        <div class="img-thumbnail"></div>
-                                        {{ form.as_div }}
-                                    {% endfor %}
+                                <div class="img-container">
+                                    <div class="main-img">
+                                        <div class="img-thumbnail" id="main-img"
+                                             onclick="document.getElementById('id_form-0-image').click()">
+                                            <img id="main-thumbnail-preview" src="#" alt="Upload Icon"
+                                                 style="display:none;"/>
+                                            <i class="fa-regular fa-image" id="main-upload-icon"></i>
+                                        </div>
+                                        <div style="display:none;">
+                                            {{ image_form.forms.0.image.label_tag }}:
+                                            {{ image_form.forms.0.image }}
+                                            {{ image_form.forms.0.id }}
+                                        </div>
+                                    </div>
+                                    <div class="side-imgs">
+                                        {% for form in image_form.forms %}
+                                            {% if forloop.counter0 > 0 %}
+                                                <div class="side-img">
+                                                    <div class="img-thumbnail"
+                                                         onclick="document.getElementById('id_form-{{ forloop.counter0 }}-image').click()">
+                                                        <img id="thumbnail-preview-{{ forloop.counter0 }}" src="#"
+                                                             alt="Upload Icon" style="display:none;"/>
+                                                        <i class="fa-regular fa-image"
+                                                           id="upload-icon-{{ forloop.counter0 }}"></i>
+                                                    </div>
+                                                    <div style="display:none;">
+                                                        {{ form.image.label_tag }}:
+                                                        {{ form.image }}
+                                                        {{ form.id }}
+                                                    </div>
+                                                </div>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
                                 </div>
 
                                 <button type='submit' class='btn btn-primary'>
@@ -45,6 +156,8 @@
                                 </a>
                             </div>
                         </form>
+
+
                     </div>
                 </div>
             </div>
@@ -52,4 +165,48 @@
         {% endif %}
     </div>
 
+    <script>
+        function readURL(input, previewId, iconId) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    document.getElementById(previewId).src = e.target.result;
+                    document.getElementById(previewId).style.display = 'block';
+                    document.getElementById(iconId).style.display = 'none';
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        document.getElementById('id_form-0-image').addEventListener('change', function () {
+            readURL(this, 'main-thumbnail-preview', 'main-upload-icon');
+        });
+
+        for (let i = 1; i <= 4; i++) {
+            document.getElementById('id_form-' + i + '-image').addEventListener('change', function () {
+                readURL(this, 'thumbnail-preview-' + i, 'upload-icon-' + i);
+            });
+        }
+
+        // Show modal on page load
+        window.onload = function () {
+            document.getElementById('optionModal').style.display = 'block';
+        };
+
+        // Close modal when an option is clicked
+        document.getElementById('scanBarcode').onclick = function () {
+            document.getElementById('optionModal').style.display = 'none';
+            // Handle Scan Barcode option
+        };
+
+        document.getElementById('enterDetails').onclick = function () {
+            document.getElementById('optionModal').style.display = 'none';
+            // Handle Enter Details Manually option
+        };
+
+        document.getElementById('importExcel').onclick = function () {
+            document.getElementById('optionModal').style.display = 'none';
+            // Handle Import Excel option
+        };
+    </script>
 {% endblock %}

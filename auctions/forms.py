@@ -10,8 +10,8 @@ class AuctionForm(forms.ModelForm):
 
     class Meta:
         model = Auction
-        fields = ['title', 'description', 'category', 'starting_bid', 'manufacturer', 'reference_number', 'lot_number',
-                  'expiration_date', 'package_type', 'package_quantity', 'deviceSterile']
+        fields = ['title', 'description', 'category', 'starting_bid', 'reserve_bid', 'manufacturer', 'reference_number', 'lot_number',
+                  'expiration_date', 'package_type', 'package_quantity', 'deviceSterile', 'fullPackage']
 
     def __init__(self, *args, **kwargs):
         super(AuctionForm, self).__init__(*args, **kwargs)
@@ -31,6 +31,7 @@ class ImageForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(ImageForm, self).__init__(*args, **kwargs)
         self.visible_fields()[0].field.widget.attrs['class'] = 'form-control'
+
 
 
 class CommentForm(forms.ModelForm):

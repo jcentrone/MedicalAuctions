@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db import IntegrityError
 from django.http import HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.urls import reverse
 
 from .forms import AuctionForm, ImageForm, CommentForm, BidForm
@@ -149,9 +149,6 @@ def logout_view(request):
 
 @login_required
 def auction_create(request):
-    """
-    It allows the user to create a new auction
-    """
     ImageFormSet = forms.modelformset_factory(Image, form=ImageForm, extra=5)
 
     if request.method == 'POST':
@@ -163,34 +160,24 @@ def auction_create(request):
             new_auction.creator = request.user
             new_auction.save()
 
-            for auction_form in image_form.cleaned_data:
-                if auction_form:
-                    image = auction_form['image']
-
+            for form in image_form.cleaned_data:
+                if form:
+                    image = form['image']
                     new_image = Image(auction=new_auction, image=image)
                     new_image.save()
 
-            return render(request, 'auction_create.html', {
-                'categories': Category.objects.all(),
-                'auction_form': AuctionForm(),
-                'image_form': ImageFormSet(queryset=Image.objects.none()),
-                'title': 'Create Auction',
-                'success': True
-            })
-        else:
-            return render(request, 'auction_create.html', {
-                'categories': Category.objects.all(),
-                'auction_form': AuctionForm(),
-                'image_form': ImageFormSet(queryset=Image.objects.none()),
-                'title': 'Create Auction',
-            })
+            return redirect('active_auctions_view')
+
     else:
-        return render(request, 'auction_create.html', {
-            'categories': Category.objects.all(),
-            'auction_form': AuctionForm(),
-            'image_form': ImageFormSet(queryset=Image.objects.none()),
-            'title': 'Create Auction',
-        })
+        auction_form = AuctionForm()
+        image_form = ImageFormSet(queryset=Image.objects.none())
+
+    return render(request, 'auction_create.html', {
+        'categories': Category.objects.all(),
+        'auction_form': auction_form,
+        'image_form': image_form,
+        'title': 'Create Auction',
+    })
 
 
 def active_auctions_view(request):

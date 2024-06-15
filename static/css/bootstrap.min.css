@@ -310,26 +310,28 @@ th {
 tbody, td, tfoot, th, thead, tr {
     border-color: inherit;
     border-style: solid;
-    border-width: 0
+    border-width: 0;
 }
 
 label {
-    display: inline-block
+    display: inline-block;
+    text-transform: capitalize;
 }
 
 button {
-    border-radius: 0
+    border-radius: 0;
 }
 
 button:focus:not(:focus-visible) {
-    outline: 0
+    outline: 0;
 }
 
 button, input, optgroup, select, textarea {
     margin: 0;
     font-family: inherit;
     font-size: inherit;
-    line-height: inherit
+    line-height: inherit;
+    border-bottom: 1px solid #ccc !important;
 }
 
 button, select {
@@ -2236,10 +2238,10 @@ progress {
     background-color: #f7f7f9;
     background-clip: padding-box;
     border: 0 solid #ced4da;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    border-radius: 0;
+    /*-webkit-appearance: none;*/
+    /*-moz-appearance: none;*/
+    /*appearance: none;*/
+    border-radius: var(--border-radius);
     transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out
 }
 
@@ -3111,8 +3113,9 @@ textarea.form-control-lg {
 
 .btn-primary {
     color: #fff;
-    background-color: #02192b;
-    border-color: #02192b
+    background-color: #02192B;
+    border-color: #02192b;
+    border-radius: var(--border-radius);
 }
 
 .btn-primary:hover {
