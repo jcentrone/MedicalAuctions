@@ -49,10 +49,13 @@ header {
 }
 
 header .logo {
-    font-family: "Montserrat", sans-serif;
+    font-family: "Futura", sans-serif;
     font-weight: bold;
     font-size: 24px;
-    text-shadow: 2px 2px 4px rgba(51, 51, 51, 0.7);
+    text-shadow: 3px 3px 5px rgba(51, 51, 51, 0.7);
+    cursor: pointer;
+    text-decoration: none;
+    color: var(--white);
 }
 
 .logo {
@@ -215,6 +218,7 @@ header nav ul li a {
 footer.sticky-footer {
     padding: 2rem 0;
     flex-shrink: 0;
+    color: #000000;
 }
 
 footer.sticky-footer .copyright {

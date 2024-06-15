@@ -9,30 +9,12 @@
 
 
 {% block body %}
-    {#<header>#}
-    {#    <div class="logo">#}
-    {#        <img src="{% static "images/HealthcareAuctionsLogo_no_bg.png" %} " alt="Auction 1">#}
-    {#        HealthcareAuctions.com#}
-    {#    </div>#}
-    {#    <nav>#}
-    {#        <ul>#}
-    {#            <li><a href="#">Home</a></li>#}
-    {#            <li><a href="#">About</a></li>#}
-    {#            <li><a href="#">Services</a></li>#}
-    {#            <li><a href="/auction/active">Auctions</a></li>#}
-    {#            <li><a href="#">Contact</a></li>#}
-    {#            <li><a href="/register" class="button primary">Sign Up</a></li>#}
-    {#            <li><a href="/login" class="button secondary">Login</a></li>#}
-    {#        </ul>#}
-    {#    </nav>#}
-    {#</header>#}
-
     <div class=container style="padding: 0;">
 
         <section class="hero">
             <h1>Welcome to Healthcare Auctions</h1>
             <p>Your trusted platform for healthcare equipment and supplies.</p>
-            <a href="#" class="button primary">Explore Auctions</a>
+            <a href="{% url 'active_auctions_view' %}" class="button primary">Explore Auctions</a>
         </section>
 
         <section class="featured-auctions">
@@ -40,7 +22,7 @@
             <div class="grid">
 
                 {% for auction in pages %}
-                    <div class="auction-item">
+                    <a class="auction-item" href="{% url 'auction_details_view' auction.id %}">
                         {% if auction.image %}
                             <img src="{{ auction.image.image.url }}" alt="{{ auction.title }}">
                         {% else %}
@@ -48,8 +30,18 @@
                         {% endif %}
                         <h3>{{ auction.title }}</h3>
                         <p>{{ auction.category }}</p>
-                        <h3>{{ auction.current_bid }}</h3>
-                    </div>
+                        <h3>
+                            <!-- Product price-->
+                            {% if auction.current_bid %}
+                                ${{ auction.current_bid }}
+                            {% else %}
+                                ${{ auction.starting_bid }}
+                            {% endif %}
+
+                        </h3>
+
+                        {#                    auction.id#}
+                    </a>
 
                 {% endfor %}
 
@@ -101,62 +93,65 @@
 
 
         <section class="why-choose-us">
-        <h2>Why Choose Healthcare Auctions</h2>
-        <ul>
-            <li>
-                <i class="fas fa-shield-alt"></i>
-                <div>
-                    <strong>Trusted Platform</strong>
-                    <p>We offer transaction insurance guaranteeing the product is as expected, or we will refund your money. This is a first for excess medical supplies auctions.</p>
-                </div>
-            </li>
-            <li>
-                <i class="fas fa-check-circle"></i>
-                <div>
-                    <strong>High-Quality Listings</strong>
-                    <p>All listings are thoroughly vetted to ensure they meet our high standards of quality and reliability.</p>
-                </div>
-            </li>
-            <li>
-                <i class="fas fa-lock"></i>
-                <div>
-                    <strong>Secure Transactions</strong>
-                    <p>Our platform uses advanced security measures to protect your transactions and personal information.</p>
-                </div>
-            </li>
-            <li>
-                <i class="fas fa-headset"></i>
-                <div>
-                    <strong>Excellent Support</strong>
-                    <p>Our dedicated support team is available to assist you with any questions you may have.</p>
-                </div>
-            </li>
-        </ul>
-    </section>
-
-
-        <section class="testimonials">
-            <h2>What Our Clients Say</h2>
-            <div class="carousel">
-                <div class="testimonial">
-                    <p>"Great platform for finding the best healthcare equipment!"</p>
-                    <span>- Client Name</span>
-                </div>
-                <div class="testimonial">
-                    <p>"Easy to use and reliable service."</p>
-                    <span>- Client Name</span>
-                </div>
-                <div class="testimonial">
-                    <p>"Highly recommend Healthcare Auctions for their excellent support."</p>
-                    <span>- Client Name</span>
-                </div>
-            </div>
+            <h2>Why Choose Healthcare Auctions</h2>
+            <ul>
+                <li>
+                    <i class="fas fa-shield-alt"></i>
+                    <div>
+                        <strong>Trusted Platform</strong>
+                        <p>We offer transaction insurance guaranteeing the product is as expected, or we will refund
+                            your money. This is a first for excess medical supplies auctions.</p>
+                    </div>
+                </li>
+                <li>
+                    <i class="fas fa-check-circle"></i>
+                    <div>
+                        <strong>High-Quality Listings</strong>
+                        <p>All listings are thoroughly vetted to ensure they meet our high standards of quality and
+                            reliability.</p>
+                    </div>
+                </li>
+                <li>
+                    <i class="fas fa-lock"></i>
+                    <div>
+                        <strong>Secure Transactions</strong>
+                        <p>Our platform uses advanced security measures to protect your transactions and personal
+                            information.</p>
+                    </div>
+                </li>
+                <li>
+                    <i class="fas fa-headset"></i>
+                    <div>
+                        <strong>Excellent Support</strong>
+                        <p>Our dedicated support team is available to assist you with any questions you may have.</p>
+                    </div>
+                </li>
+            </ul>
         </section>
+
+
+        {#        <section class="testimonials">#}
+        {#            <h2>What Our Clients Say</h2>#}
+        {#            <div class="carousel">#}
+        {#                <div class="testimonial">#}
+        {#                    <p>"Great platform for finding the best healthcare equipment!"</p>#}
+        {#                    <span>- Client Name</span>#}
+        {#                </div>#}
+        {#                <div class="testimonial">#}
+        {#                    <p>"Easy to use and reliable service."</p>#}
+        {#                    <span>- Client Name</span>#}
+        {#                </div>#}
+        {#                <div class="testimonial">#}
+        {#                    <p>"Highly recommend Healthcare Auctions for their excellent support."</p>#}
+        {#                    <span>- Client Name</span>#}
+        {#                </div>#}
+        {#            </div>#}
+        {#        </section>#}
 
         <section class="call-to-action">
             <h2>Ready to Start Bidding?</h2>
             <p>Join us today and find the best deals on healthcare equipment.</p>
-            <a href="#" class="button primary">Sign Up Now</a>
+            <a href="{% url 'register' %}" class="button primary">Sign Up Now</a>
         </section>
     </div>
 {% endblock %}

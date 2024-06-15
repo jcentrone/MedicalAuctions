@@ -6,8 +6,8 @@
 
 
 {% block body %}
-    
-     {% include 'sidebar.html' %}
+
+    {% include 'sidebar.html' %}
 
     <div class="container">
     <!-- Page Heading -->
@@ -46,9 +46,9 @@
                                 
                                     <!-- Product price-->
                                     {% if auction.current_bid %}
-                                        &euro;{{auction.current_bid}}
+                                        ${{auction.current_bid}}
                                     {% else %}
-                                        &euro;{{auction.starting_bid}}
+                                        ${{auction.starting_bid}}
                                     {% endif %}
                             
                                 </div>
