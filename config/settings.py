@@ -1,10 +1,16 @@
 import os
+import secrets
+
+import dj_database_url
 from decouple import config
 
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-SECRET_KEY = config('SECRET_KEY')
+SECRET_KEY = os.environ.get(
+    "SECRET_KEY",
+    default=secrets.token_urlsafe(nbytes=64),
+)
 
 DEBUG = config('DEBUG', default=False, cast=bool)
 
@@ -63,16 +69,24 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': config('DATABASE_NAME'),
+#         'USER': config('DATABASE_USER'),
+#         'PASSWORD': config('DATABASE_PASS'),
+#         'HOST': config('DATABASE_HOST'),
+#         'PORT': '',  # leave blank so the default port is selected
+#     }
+# }
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': config('DATABASE_NAME'),
-        'USER': config('DATABASE_USER'),
-        'PASSWORD': config('DATABASE_PASS'),
-        'HOST': config('DATABASE_HOST'),
-        'PORT': '',  # leave blank so the default port is selected
+        "default": dj_database_url.config(
+            env="DATABASE_URL",
+            conn_max_age=600,
+            conn_health_checks=True,
+            ssl_require=True,
+        ),
     }
-}
 
 AUTH_USER_MODEL = 'auctions.User'
 
