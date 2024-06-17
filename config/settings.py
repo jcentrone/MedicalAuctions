@@ -18,6 +18,10 @@ ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
     'https://medical-auctions-757e84a2ed6f.herokuapp.com/',
+    "[::1]",
+    "0.0.0.0",
+    ["*"]
+
 ]
 
 
