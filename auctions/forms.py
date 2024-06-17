@@ -10,7 +10,7 @@ class AuctionForm(forms.ModelForm):
 
     class Meta:
         model = Auction
-        fields = ['title', 'description', 'category', 'starting_bid', 'reserve_bid', 'manufacturer', 'reference_number', 'lot_number',
+        fields = ['title', 'description', 'category', 'starting_bid', 'reserve_bid', 'auction_duration', 'manufacturer', 'reference_number', 'lot_number',
                   'expiration_date', 'package_type', 'package_quantity', 'deviceSterile', 'fullPackage']
 
     def __init__(self, *args, **kwargs):

@@ -331,7 +331,7 @@ button, input, optgroup, select, textarea {
     font-family: inherit;
     font-size: inherit;
     line-height: inherit;
-    border-bottom: 1px solid #ccc !important;
+    border-bottom: 1px solid #777 !important;
 }
 
 button, select {
@@ -12014,7 +12014,8 @@ th {
 }
 
 .table td, .table th {
-    padding: 1.5rem
+    padding: 1.0rem;
+    vertical-align: middle;
 }
 
 .table-sm td, .table-sm th {

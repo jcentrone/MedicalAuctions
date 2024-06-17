@@ -1007,8 +1007,8 @@ button i {
     position: relative;
     width: 100%;
     height: 150px;
-    background-color: #f0f0f0; /* Placeholder background */
-    border: 1px solid #ccc;
+    background-color: #F7F7F9; /* Placeholder background */
+    border: 1px solid #777;
     border-radius: var(--border-radius);
     margin-bottom: 10px;
     display: flex;
@@ -1048,7 +1048,7 @@ button i {
 }
 
 .btn.btn-secondary {
-    border: 1px solid #02192b;
+    border: 1px solid #02192b !important;
     border-radius: var(--border-radius);
 }
 
@@ -1063,11 +1063,17 @@ button i {
 
 .bid-details {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    align-items: center;
-    justify-content: center;
+    grid-template-columns: 1fr;
+    align-items: flex-start;
+    justify-content: flex-start;
     gap: 20px;
-    grid-column: span 2;
+    grid-row: span 2;
+    height: 20px;
+}
+.bid-row{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
 }
 
 .span-two {
@@ -1143,4 +1149,83 @@ button i {
         flex: 1 1 100%;
         max-width: 100%;
     }
+}
+
+.camera-preview {
+    position: relative;
+    width: 100%;
+    height: 400px;
+    background-color: #000;
+}
+
+.scan-guide {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80%;
+    height: 60%;
+    border: 2px solid #fff;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.brackets {
+    position: absolute;
+    border: 2px solid #fff;
+    width: 100%;
+    height: 100%;
+}
+
+.scan-line {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: red;
+    animation: scan-line 2s infinite;
+}
+
+@keyframes scan-line {
+    0% {
+        top: 10%;
+    }
+    50% {
+        top: 50%;
+    }
+    100% {
+        top: 90%;
+    }
+}
+
+.hidden {
+    display: none;
+}
+#scanModal .modal-content {
+    margin: 5% auto !important;
+}
+
+#closeScanModal {
+    margin-top: 20px;
+    /* border: 1px solid #02192b; */
+}
+
+#importModal .modal-content {
+    max-width: unset;
+    width: 90%;
+    margin: 5%;
+}
+
+#import-button,
+#closeImportModal{
+    margin-top: 20px;
+}
+
+#import-buttons{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
 }

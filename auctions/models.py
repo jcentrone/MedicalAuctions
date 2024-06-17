@@ -25,6 +25,13 @@ class Category(models.Model):
 
 
 class Auction(models.Model):
+    DURATION_CHOICES = [
+        (1, '1 day'),
+        (3, '3 days'),
+        (5, '5 days'),
+        (7, '7 days'),
+        (10, '10 days')
+    ]
     title = models.CharField('Product Name', max_length=100)
     description = models.TextField(max_length=800, null=True)
     creator = models.ForeignKey(User, on_delete=models.PROTECT, related_name='auction_creator')
@@ -69,7 +76,7 @@ class Auction(models.Model):
     size_information = models.TextField(null=True, blank=True)
     storage_handling = models.JSONField(null=True, blank=True)
     fullPackage = models.BooleanField('Package Full', default=False)
-
+    auction_duration = models.IntegerField(choices=DURATION_CHOICES, default=7)
 
     def __str__(self):
         return f'Auction #{self.id}: {self.title} ({self.creator})'
