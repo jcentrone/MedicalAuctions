@@ -74,14 +74,14 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
-DATABASES = {
-        "default": dj_database_url.config(
-            env=config('DATABASE_URL'),
-            conn_max_age=600,
-            conn_health_checks=True,
-            ssl_require=True,
-        ),
-    }
+# DATABASES = {
+#         "default": dj_database_url.config(
+#             env=config('DATABASE_URL'),
+#             conn_max_age=600,
+#             conn_health_checks=True,
+#             ssl_require=True,
+#         ),
+#     }
 
 # DATABASES = {
 #     'default': {
@@ -93,14 +93,14 @@ DATABASES = {
 #         'PORT': '',  # leave blank so the default port is selected
 #     }
 # }
-# DATABASES = {
-#         "default": dj_database_url.config(
-#             env="DATABASE_URL",
-#             conn_max_age=600,
-#             conn_health_checks=True,
-#             ssl_require=True,
-#         ),
-#     }
+DATABASES = {
+        "default": dj_database_url.config(
+            env="DATABASE_URL",
+            conn_max_age=600,
+            conn_health_checks=True,
+            ssl_require=True,
+        ),
+    }
 
 AUTH_USER_MODEL = 'auctions.User'
 
