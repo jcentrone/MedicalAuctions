@@ -1,3 +1,4 @@
+import json
 from decimal import Decimal
 
 from django import forms
@@ -5,12 +6,14 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db import IntegrityError
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse
+from django.views.decorators.csrf import csrf_exempt
 
 from .forms import AuctionForm, ImageForm, CommentForm, BidForm
 from .models import Auction, Bid, Category, Image, User
+from .utils.helpers import classify_and_save_device
 
 
 def index(request):
@@ -389,3 +392,12 @@ def category_details_view(request, category_name):
         'pages': pages,
         'title': category.category_name
     })
+
+
+@csrf_exempt
+def classify_device_view(request):
+    if request.method == 'POST':
+        device_data = json.loads(request.body)
+        category = classify_and_save_device(device_data)
+        return JsonResponse({'category': str(category)}, status=201)
+    return JsonResponse({'error': 'Invalid request'}, status=400)

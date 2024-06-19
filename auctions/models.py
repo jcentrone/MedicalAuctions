@@ -11,10 +11,12 @@ class User(AbstractUser):
 
 class Category(models.Model):
     category_name = models.CharField(max_length=50)
+    parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='subcategories')
 
     class Meta:
         verbose_name = 'Category'
         verbose_name_plural = 'Categories'
+        unique_together = ('category_name', 'parent')  # Prevent duplicate categories under the same parent
 
     def __str__(self):
         return f'{self.category_name}'
@@ -22,6 +24,7 @@ class Category(models.Model):
     @property
     def count_active_auctions(self):
         return Auction.objects.filter(category=self).count()
+
 
 
 class Auction(models.Model):
@@ -32,11 +35,12 @@ class Auction(models.Model):
         (7, '7 days'),
         (10, '10 days')
     ]
-    title = models.CharField('Product Name', max_length=100)
+    title = models.CharField('Title', max_length=100)
     description = models.TextField(max_length=800, null=True)
     creator = models.ForeignKey(User, on_delete=models.PROTECT, related_name='auction_creator')
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='auction_category')
     date_created = models.DateTimeField(default=timezone.now)
+    quantity_available = models.IntegerField('Quantity Available', null=True, blank=True)
     starting_bid = models.DecimalField(
         max_digits=7,
         decimal_places=2,
@@ -59,13 +63,15 @@ class Auction(models.Model):
     buyer = models.ForeignKey(User, on_delete=models.PROTECT, null=True)
     watchers = models.ManyToManyField(User, related_name='watchlist', blank=True)
     active = models.BooleanField(default=True)
-
+    product_name = models.CharField('Product Name', max_length=256, null=True, blank=True)
+    package_quantity = models.IntegerField(null=True, blank=True)
     manufacturer = models.CharField(max_length=100, null=True, blank=True)
     reference_number = models.CharField(max_length=100, null=True, blank=True)
     lot_number = models.CharField(max_length=100, null=True, blank=True)
     expiration_date = models.DateField(null=True, blank=True)
     package_type = models.CharField(max_length=100, null=True, blank=True)
-    package_quantity = models.IntegerField(null=True, blank=True)
+    udi = models.CharField('UDI', null=True, blank=True)
+
     gmdnPTDefinition = models.TextField(null=True, blank=True)
     implantable = models.BooleanField(default=False)
     productCode = models.CharField(max_length=100, null=True, blank=True)
