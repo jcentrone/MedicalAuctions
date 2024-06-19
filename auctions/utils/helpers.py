@@ -17,7 +17,7 @@ def classify_and_save_device(device_data):
     """
     This function classifies the device based on its data and saves the category hierarchy in the database.
     """
-    medical_specialty = device_data.get('medical_specialty_description', 'Unclassified')
+    medical_specialty = device_data.medical_specialty_description, 'Unclassified'
     device_class = "Class " + device_data.get('device_class', 'Unknown')
     device_name = device_data.get('device_name', 'Unknown Device')
 

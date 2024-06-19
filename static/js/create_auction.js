@@ -199,11 +199,12 @@ function fetchClassificationData(code) {
         .then(data => {
             console.log("Device data from AccessGUDID Classification:", data);
 
-            const classificationData = {
+            let classificationData = {
                 medical_specialty_description: data.results[0].medical_specialty_description,
                 device_class: data.results[0].device_class,
                 device_name: data.results[0].device_name
             };
+            console.log("Classification Date:", classificationData);
 
             // Send classification data to the server to create or update categories
             fetch('/api/classify-device/', {
@@ -225,6 +226,9 @@ function fetchClassificationData(code) {
         .catch(error => console.error('Error fetching device data:', error));
 }
 
+function getCsrfToken() {
+    return document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+}
 
 function populateForm(data) {
     if (data && data.gudid && data.gudid.device) {
