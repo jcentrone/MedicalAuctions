@@ -11,7 +11,7 @@ class AuctionForm(forms.ModelForm):
     class Meta:
         model = Auction
         fields = ['title', 'product_name', 'description', 'category', 'starting_bid', 'reserve_bid', 'auction_duration', 'manufacturer', 'reference_number', 'lot_number',
-                  'expiration_date', 'package_type', 'package_quantity', 'deviceSterile', 'fullPackage', 'udi', 'quantity_available']
+                  'expiration_date', 'package_type', 'package_quantity', 'deviceSterile', 'fullPackage', 'udi', 'quantity_available', 'production_date']
 
     def __init__(self, *args, **kwargs):
         super(AuctionForm, self).__init__(*args, **kwargs)

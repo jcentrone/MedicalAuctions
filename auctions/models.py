@@ -69,6 +69,7 @@ class Auction(models.Model):
     reference_number = models.CharField(max_length=100, null=True, blank=True)
     lot_number = models.CharField(max_length=100, null=True, blank=True)
     expiration_date = models.DateField(null=True, blank=True)
+    production_date = models.DateField(null=True, blank=True)
     package_type = models.CharField(max_length=100, null=True, blank=True)
     udi = models.CharField('UDI', null=True, blank=True)
 

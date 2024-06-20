@@ -47,21 +47,21 @@ Object.keys(options).forEach(option => {
     };
 });
 
-['closeScanModal', 'closeScanBarcodesModal', 'closeImportModal'].forEach(id => {
-    const closeButton = document.getElementById(id);
-    if (closeButton) {
-        closeButton.onclick = () => {
-            const modalId = id.replace('close', '').toLowerCase();
-            const modal = document.getElementById(modalId);
-            if (modal) {
-                modal.style.display = 'none';
-            }
-            if (id === 'closeScanModal') stopScanner();
-        };
-    } else {
-        console.error(`Element with ID ${id} not found`);
-    }
-});
+// ['closeScanModal', 'closeScanBarcodesModal', 'closeImportModal'].forEach(id => {
+//     const closeButton = document.getElementById(id);
+//     if (closeButton) {
+//         closeButton.onclick = () => {
+//             const modalId = id.replace('close', '').toLowerCase();
+//             const modal = document.getElementById(modalId);
+//             if (modal) {
+//                 modal.style.display = 'none';
+//             }
+//             if (id === 'closeScanModal') stopScanner();
+//         };
+//     } else {
+//         console.error(`Element with ID ${id} not found`);
+//     }
+// });
 
 document.getElementById('openScanButton').onclick = () => {
     document.getElementById('importModal').style.display = 'none';
@@ -74,88 +74,8 @@ document.getElementById('id_udi').addEventListener('change', (e) => {
     parseBarcode(e.target.value);
 });
 
-// function startScanner(inputId = null) {
-//     currentInputId = inputId;
-//
-//     Quagga.init({
-//         inputStream: {
-//             name: "Live",
-//             type: "LiveStream",
-//             target: document.querySelector('#video'),
-//             constraints: {
-//                 facingMode: "environment"
-//             }
-//         },
-//         decoder: {
-//             readers: ["code_128_reader", "ean_reader", "ean_8_reader", "code_39_reader", "code_39_vin_reader", "codabar_reader", "upc_reader", "upc_e_reader", "i2of5_reader"]
-//         }
-//     }, (err) => {
-//         if (err) {
-//             console.error(err);
-//             return;
-//         }
-//         console.log("QuaggaJS initialized. Ready to start");
-//         Quagga.start();
-//     });
-//
-//     Quagga.offDetected(onDetected);
-//     Quagga.onDetected(onDetected);
-//
-//     const video = document.getElementById('video');
-//     const canvas = document.getElementById('canvas');
-//     const context = canvas.getContext('2d');
-//
-//     navigator.mediaDevices.getUserMedia({video: {facingMode: "environment"}})
-//         .then((stream) => {
-//             video.srcObject = stream;
-//             video.setAttribute("playsinline", true);
-//             video.play();
-//             console.log("Video stream started");
-//             requestAnimationFrame(tick);
-//         })
-//         .catch((err) => {
-//             console.error("Error accessing the camera: " + err);
-//         });
-//
-//     function tick() {
-//         if (video.readyState === video.HAVE_ENOUGH_DATA) {
-//             canvas.height = video.videoHeight;
-//             canvas.width = video.videoWidth;
-//             context.drawImage(video, 0, 0, canvas.width, canvas.height);
-//             const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-//             const code = jsQR(imageData.data, imageData.width, imageData.height);
-//             if (code) {
-//                 console.log("QR code detected: " + code.data);
-//                 parseBarcode(code.data);
-//                 stopScanner();
-//             }
-//         }
-//         requestAnimationFrame(tick);
-//     }
-// }
-//
-// function stopScanner() {
-//     Quagga.stop();
-//     const video = document.getElementById('video');
-//     if (video.srcObject) {
-//         video.srcObject.getTracks().forEach(track => track.stop());
-//         video.srcObject = null;
-//     }
-// }
-//
-// function onDetected(result) {
-//     console.log(`Barcode detected and processed : [${result.codeResult.code}]`, result);
-//     if (currentInputId) {
-//         document.getElementById(currentInputId).value = result.codeResult.code;
-//         document.getElementById('scanModal').style.display = 'none';
-//         currentInputId = null;
-//         parseBarcode(result.codeResult.code);
-//     } else {
-//         parseBarcode(result.codeResult.code);
-//     }
-//     stopScanner();
-// }
 
+// Scanner Functions
 const formatMap = {
     0: 'Aztec',
     1: 'CODABAR',
@@ -178,12 +98,10 @@ const formatMap = {
 
 const scannedBarcodes = [];
 
-// document.getElementById('start-scan').addEventListener('click', function () {
-//     startScanner();
-// });
+let codeReader;
 
 function startScanner() {
-    const codeReader = new ZXing.BrowserMultiFormatReader();
+    codeReader = new ZXing.BrowserMultiFormatReader();
     codeReader.decodeFromVideoDevice(null, 'video', (result, err) => {
         if (result) {
             console.log(result);
@@ -208,26 +126,19 @@ function startScanner() {
         }
     }
 
-    // function displayDetectedBarcode(code, format, parsedResult) {
-    //     const barcodeResults = document.getElementById('barcode-results');
-    //     const resultDiv = document.createElement('div');
-    //     resultDiv.innerHTML = `<strong>Detected Barcode (${format}):</strong> ${code} <br><strong>Parsed Results:</strong> <pre>${JSON.stringify(parsedResult, null, 2)}</pre>`;
-    //     barcodeResults.appendChild(resultDiv);
-    // }
-
     const aiOptions = [
-            { label: 'GTIN/UDI', value: '01' },
-            { label: 'Batch or Lot Number', value: '10' },
-            { label: 'Production Date', value: '11' },
-            { label: 'Expiration Date', value: '17' },
-            { label: 'Unknown/Not Needed', value: 'Unknown' }
-        ];
+        {label: 'GTIN/UDI', value: '01'},
+        {label: 'Batch or Lot Number', value: '10'},
+        {label: 'Production Date', value: '11'},
+        {label: 'Expiration Date', value: '17'},
+        {label: 'Reference Number', value: 'ref'},
+        {label: 'Unknown/Not Needed', value: 'Unknown'}
+    ];
 
     function displayDetectedBarcode(code, format, parsedResult) {
         const barcodeResults = document.getElementById('barcode-results');
-        const resultDiv = document.createElement('div');
-        resultDiv.classList.add('mapping-table');
-        // resultDiv.innerHTML = `<strong>Detected Barcode (${format}):</strong> ${code}`;
+        const resultDiv = document.getElementById('mapping-table');
+
 
         for (const [key, value] of Object.entries(parsedResult)) {
             const row = document.createElement('div');
@@ -235,14 +146,6 @@ function startScanner() {
 
             const leftCell = document.createElement('div');
             leftCell.classList.add('mapping-cell');
-            leftCell.innerText = value;
-
-            const arrowCell = document.createElement('div');
-            arrowCell.classList.add('arrow');
-            arrowCell.innerHTML = `<i class="fa-solid fa-arrow-right"></i>`;
-
-            const rightCell = document.createElement('div');
-            rightCell.classList.add('mapping-cell');
             const select = document.createElement('select');
             select.classList.add('form-control');
 
@@ -256,10 +159,28 @@ function startScanner() {
                 select.appendChild(opt);
             });
 
-            rightCell.appendChild(select);
+            leftCell.appendChild(select);
+
+            const arrowCell = document.createElement('div');
+            arrowCell.classList.add('arrow');
+            arrowCell.innerHTML = `<i class="fa-solid fa-arrow-right"></i>`;
+
+            const rightCell = document.createElement('div');
+            rightCell.classList.add('mapping-cell');
+            let formattedDate;
+            if (key === 'Production Date' || key === 'Expiration Date'){
+                formattedDate = convertDate(value);
+            }
+            else{
+                formattedDate = value;
+            }
+            rightCell.innerText = formattedDate;
+
+
             row.appendChild(leftCell);
             row.appendChild(arrowCell);
             row.appendChild(rightCell);
+
 
             resultDiv.appendChild(row);
         }
@@ -298,35 +219,88 @@ function startScanner() {
                 remainingCode = remainingCode.substring(2);
             }
         }
+        console.log(parsedResult);
         return parsedResult;
     }
 
     function parseGS1Barcode(code) {
-        const aiPatterns = {
-            "01": "GTIN",
-            "10": "Batch or Lot Number",
-            "11": "Production Date",
-            "17": "Expiration Date",
-            // Add more AI patterns as needed
+        const aiMap = {
+            '00': 'SSCC',
+            '01': 'GTIN',
+            '10': 'Batch or Lot Number',
+            '11': 'Production Date',
+            '17': 'Expiration Date',
+            '21': 'Serial Number',
+            '310': 'Net Weight (kg)',
+            '320': 'Net Weight (lb)',
+            // Add more AIs as needed
         };
+
+        const fixedLengths = {
+            '00': 18,
+            '01': 14,
+            '11': 6,
+            '17': 6
+        };
+
+        let index = 0;
+        const length = code.length;
         const parsedResult = {};
-        let remainingCode = code;
-        while (remainingCode.length > 0) {
-            const ai = remainingCode.substring(0, 2);
-            if (aiPatterns[ai]) {
-                const field = aiPatterns[ai];
-                let length;
-                if (ai === "01") length = 14; // GTIN length
-                else if (ai === "10") length = 20; // Lot Number max length
-                else length = 6; // Dates length
-                const value = remainingCode.substring(2, 2 + length).replace(/[^0-9A-Za-z]/g, "");
-                parsedResult[field] = value;
-                remainingCode = remainingCode.substring(2 + length);
+        let unknownIndex = 1;
+
+        while (index < length) {
+            let ai = code.substring(index, index + 2);
+            let aiInfo = aiMap[ai];
+
+            if (!aiInfo) {
+                ai = code.substring(index, index + 3);
+                aiInfo = aiMap[ai];
+            }
+
+            if (aiInfo) {
+                index += ai.length;
+
+                // Determine length of the value
+                let value;
+                if (fixedLengths[ai]) {
+                    value = code.substring(index, index + fixedLengths[ai]);
+                    index += fixedLengths[ai];
+                } else {
+                    let endIndex = code.indexOf(',', index);
+                    if (endIndex === -1) {
+                        endIndex = length;
+                    }
+                    value = code.substring(index, endIndex);
+                    index = endIndex + 1;
+                }
+
+                parsedResult[aiInfo] = value.replace(/[^0-9A-Za-z]/g, "");
             } else {
-                remainingCode = remainingCode.substring(2);
+                // Handle unknown AI
+                let endIndex = code.indexOf(',', index);
+                if (endIndex === -1) {
+                    endIndex = length;
+                }
+                const unknownValue = code.substring(index, endIndex);
+                parsedResult[`Unknown/Not Needed`] = unknownValue.replace(/[^0-9A-Za-z]/g, "");
+                index = endIndex + 1;
             }
         }
+
+        console.log(parsedResult);
         return parsedResult;
+    }
+}
+
+function stopScanner() {
+    if (codeReader) {
+        codeReader.reset();
+        const video = document.getElementById('video');
+        if (video.srcObject) {
+            video.srcObject.getTracks().forEach(track => track.stop());
+            video.srcObject = null;
+        }
+        console.log('Scanner stopped.');
     }
 }
 
@@ -341,13 +315,7 @@ function parseBarcode(code) {
         })
         .then(data => {
             console.log("Device data from AccessGUDID:", data);
-            document.getElementById('id_lot_number').value = data.lotNumber || '';
 
-            let convertedDate = '';
-            if (data.expirationDateOriginal) {
-                convertedDate = convertDate(data.expirationDateOriginal);
-            }
-            document.getElementById('id_expiration_date').value = convertedDate;
 
             fetchDeviceData(data.udi);
 
@@ -420,7 +388,6 @@ function populateForm(data) {
         document.getElementById('id_product_name').value = device.brandName || '';
         document.getElementById('id_description').value = device.deviceDescription || '';
         document.getElementById('id_manufacturer').value = toProperCase(device.companyName) || '';
-        document.getElementById('id_reference_number').value = device.catalogNumber || '';
 
 
         let packageQuantity = '';
@@ -587,3 +554,56 @@ document.querySelectorAll('[id^="scanButton-"]').forEach(button => {
         document.getElementById('scanModal').style.display = 'block';
     });
 });
+
+
+// Event listener for the Save button
+document.getElementById('closeScanModal').addEventListener('click', function() {
+    transferDataToAuctionForm();
+});
+
+// Function to extract data from the mapping table
+function extractMappingTableData() {
+    const rows = document.querySelectorAll('#mapping-table .mapping-row');
+    const data = {};
+
+    rows.forEach(row => {
+        const key = row.querySelector('select').value;
+        const value = row.querySelector('.mapping-cell:last-child').innerText;
+        data[key] = value;
+    });
+
+    return data;
+}
+
+// Function to map extracted data to the auction form fields
+function transferDataToAuctionForm() {
+    const data = extractMappingTableData();
+    console.log(data);
+
+    // Mapping keys to form field IDs
+    const fieldMap = {
+        '01': 'id_udi',  // GTIN/UDI
+        '10': 'id_lot_number',  // Batch or Lot Number
+        '11': 'id_production_date',  // Production Date (assuming you have this field)
+        '17': 'id_expiration_date',  // Expiration Date
+        'ref': 'id_reference_number' // Reference Number
+        // Add more mappings as needed
+    };
+
+    for (const [key, value] of Object.entries(data)) {
+        const fieldId = fieldMap[key];
+        if (fieldId) {
+            let field = document.getElementById(fieldId);
+
+            if (fieldId === 'id_udi'){
+                // parseBarcode('01' + value);
+                field.value = '01' + value;
+            }
+            else{
+                field.value = value;
+            }
+            stopScanner();
+            document.getElementById('scanModal').style.display = 'none';
+        }
+    }
+}
