@@ -43,15 +43,24 @@
             <div id="scanModal" class="modal">
                 <div class="modal-content">
                     <h2>Scan Barcode</h2>
+                    {#                    <button id="start-scan">Start Scan</button>#}
                     <div id="camera-preview" class="camera-preview">
-                        <video id="video" width="100%" height="100%" autoplay></video>
-                        <canvas id="canvas" class="hidden"></canvas>
-                        <div class="scan-guide">
-                            <div class="brackets"></div>
-                            <div class="scan-line"></div>
+                        <div style="position: relative">
+                            <video id="video" width="100%" height="100%" autoplay></video>
+                            <div class="scan-guide">
+                                <div class="brackets"></div>
+                                <div class="scan-line"></div>
+                            </div>
                         </div>
+                        <div id="barcode-results">
+                            <h4>Results Map</h4>
+                            <p>Scanned barcodes will appear below. Please verify that they are correct.</p>
+                            
+                            
+                        </div>
+
                     </div>
-                    <button id="closeScanModal" class="btn btn-secondary">Close</button>
+                    <button id="closeScanModal" class="btn btn-secondary">Save</button>
                 </div>
             </div>
 
@@ -147,9 +156,9 @@
                 </div>
             </div>
 
+            <!-- Create Auction Form -->
             <h1 class='h3 mb-4 text-gray-800'>Create Auction</h1>
             <p>Enter the details of the new auction.</p>
-
             <div class='card mb-4'>
                 <div class='card-body'>
                     <h3 class="package-details-heading">Auction Summary</h3>
@@ -178,11 +187,11 @@
                                         {{ auction_form.category }}
                                     </div>
                                     <div class="bid-row">
-                                        <div>
+                                        <div class="form-group with-symbol">
                                             {{ auction_form.starting_bid.label_tag }}
                                             {{ auction_form.starting_bid }}
                                         </div>
-                                        <div>
+                                        <div class="form-group with-symbol">
                                             {{ auction_form.reserve_bid.label_tag }}
                                             {{ auction_form.reserve_bid }}
                                         </div>
@@ -204,7 +213,7 @@
                                 </div>
 
                                 <!-- Insert the heading here -->
-                                <h3 class="package-details-heading">Enter Product Details</h3>
+                                <h3 class="package-details-heading">Product Details</h3>
 
                                 <div>
                                     {{ auction_form.manufacturer.label_tag }}
@@ -282,6 +291,7 @@
                                     </div>
                                 </div>
 
+
                                 <button type='submit' class='btn btn-primary'>
                                     Save
                                 </button>
@@ -295,6 +305,7 @@
             </div>
         {% endif %}
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/@zxing/library@latest/umd/index.min.js"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>

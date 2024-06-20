@@ -18,6 +18,6 @@ urlpatterns = [
     path('auction/<str:auction_id>/close', views.auction_close, name='auction_close'),
     path('auction/<str:auction_id>/comment', views.auction_comment, name='auction_comment'),
     path('categories/<str:category_name>', views.category_details_view, name='category_details_view'),
-    path('api/classify-device/', views.classify_and_save_device, name='classify_device')
-
+    path('api/classify-device/', views.classify_and_save_device, name='classify_device'),
+    path('barcode_scanner/', views.barcode_scanner, name='barcode_scanner'),
 ]

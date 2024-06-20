@@ -12,14 +12,23 @@ function readURL(input, previewId, iconId) {
     }
 }
 
-document.querySelectorAll('[id^="id_form-"]').forEach((input, index) => {
+// Attach event listener to the main image input
+document.getElementById('id_form-0-image').addEventListener('change', () => {
+    readURL(document.getElementById('id_form-0-image'), 'main-thumbnail-preview', 'main-upload-icon');
+});
+
+// Attach event listeners to all image upload inputs
+document.querySelectorAll('input[type="file"][id^="id_form-"]').forEach((input) => {
+    const index = input.id.match(/\d+/)[0]; // Extract the index from the input ID
     input.addEventListener('change', () => {
         readURL(input, `thumbnail-preview-${index}`, `upload-icon-${index}`);
     });
 });
 
+
 window.onload = () => {
     document.getElementById('optionModal').style.display = 'block';
+    // document.getElementById('optionModal').style.display = 'none';
 };
 
 const options = {
@@ -65,88 +74,263 @@ document.getElementById('id_udi').addEventListener('change', (e) => {
     parseBarcode(e.target.value);
 });
 
-function startScanner(inputId = null) {
-    currentInputId = inputId;
+// function startScanner(inputId = null) {
+//     currentInputId = inputId;
+//
+//     Quagga.init({
+//         inputStream: {
+//             name: "Live",
+//             type: "LiveStream",
+//             target: document.querySelector('#video'),
+//             constraints: {
+//                 facingMode: "environment"
+//             }
+//         },
+//         decoder: {
+//             readers: ["code_128_reader", "ean_reader", "ean_8_reader", "code_39_reader", "code_39_vin_reader", "codabar_reader", "upc_reader", "upc_e_reader", "i2of5_reader"]
+//         }
+//     }, (err) => {
+//         if (err) {
+//             console.error(err);
+//             return;
+//         }
+//         console.log("QuaggaJS initialized. Ready to start");
+//         Quagga.start();
+//     });
+//
+//     Quagga.offDetected(onDetected);
+//     Quagga.onDetected(onDetected);
+//
+//     const video = document.getElementById('video');
+//     const canvas = document.getElementById('canvas');
+//     const context = canvas.getContext('2d');
+//
+//     navigator.mediaDevices.getUserMedia({video: {facingMode: "environment"}})
+//         .then((stream) => {
+//             video.srcObject = stream;
+//             video.setAttribute("playsinline", true);
+//             video.play();
+//             console.log("Video stream started");
+//             requestAnimationFrame(tick);
+//         })
+//         .catch((err) => {
+//             console.error("Error accessing the camera: " + err);
+//         });
+//
+//     function tick() {
+//         if (video.readyState === video.HAVE_ENOUGH_DATA) {
+//             canvas.height = video.videoHeight;
+//             canvas.width = video.videoWidth;
+//             context.drawImage(video, 0, 0, canvas.width, canvas.height);
+//             const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+//             const code = jsQR(imageData.data, imageData.width, imageData.height);
+//             if (code) {
+//                 console.log("QR code detected: " + code.data);
+//                 parseBarcode(code.data);
+//                 stopScanner();
+//             }
+//         }
+//         requestAnimationFrame(tick);
+//     }
+// }
+//
+// function stopScanner() {
+//     Quagga.stop();
+//     const video = document.getElementById('video');
+//     if (video.srcObject) {
+//         video.srcObject.getTracks().forEach(track => track.stop());
+//         video.srcObject = null;
+//     }
+// }
+//
+// function onDetected(result) {
+//     console.log(`Barcode detected and processed : [${result.codeResult.code}]`, result);
+//     if (currentInputId) {
+//         document.getElementById(currentInputId).value = result.codeResult.code;
+//         document.getElementById('scanModal').style.display = 'none';
+//         currentInputId = null;
+//         parseBarcode(result.codeResult.code);
+//     } else {
+//         parseBarcode(result.codeResult.code);
+//     }
+//     stopScanner();
+// }
 
-    Quagga.init({
-        inputStream: {
-            name: "Live",
-            type: "LiveStream",
-            target: document.querySelector('#video'),
-            constraints: {
-                facingMode: "environment"
-            }
-        },
-        decoder: {
-            readers: ["code_128_reader", "ean_reader", "ean_8_reader", "code_39_reader", "code_39_vin_reader", "codabar_reader", "upc_reader", "upc_e_reader", "i2of5_reader"]
+const formatMap = {
+    0: 'Aztec',
+    1: 'CODABAR',
+    2: 'Code 39',
+    3: 'Code 93',
+    4: 'Code 128',
+    5: 'Data Matrix',
+    6: 'EAN-8',
+    7: 'EAN-13',
+    8: 'ITF',
+    9: 'MaxiCode',
+    10: 'PDF 417',
+    11: 'QR Code',
+    12: 'RSS 14',
+    13: 'RSS Expanded',
+    14: 'UPC-A',
+    15: 'UPC-E',
+    16: 'UPC-EAN Extension'
+};
+
+const scannedBarcodes = [];
+
+// document.getElementById('start-scan').addEventListener('click', function () {
+//     startScanner();
+// });
+
+function startScanner() {
+    const codeReader = new ZXing.BrowserMultiFormatReader();
+    codeReader.decodeFromVideoDevice(null, 'video', (result, err) => {
+        if (result) {
+            console.log(result);
+            processDetectedBarcode(result);
         }
-    }, (err) => {
-        if (err) {
+        if (err && !(err instanceof ZXing.NotFoundException)) {
             console.error(err);
-            return;
         }
-        console.log("QuaggaJS initialized. Ready to start");
-        Quagga.start();
     });
 
-    Quagga.offDetected(onDetected);
-    Quagga.onDetected(onDetected);
+    function processDetectedBarcode(result) {
+        const code = result.text;
+        const format = formatMap[result.format];
 
-    const video = document.getElementById('video');
-    const canvas = document.getElementById('canvas');
-    const context = canvas.getContext('2d');
+        if (!scannedBarcodes.find(item => item.code === code)) {
+            const parsedResult = format === 'QR Code' || format === 'Data Matrix'
+                ? parseQRCode(code)
+                : parseGS1Barcode(code);
 
-    navigator.mediaDevices.getUserMedia({video: {facingMode: "environment"}})
-        .then((stream) => {
-            video.srcObject = stream;
-            video.setAttribute("playsinline", true);
-            video.play();
-            console.log("Video stream started");
-            requestAnimationFrame(tick);
-        })
-        .catch((err) => {
-            console.error("Error accessing the camera: " + err);
-        });
+            scannedBarcodes.push({code: code, format: format, parsed: parsedResult});
+            displayDetectedBarcode(code, format, parsedResult);
+        }
+    }
 
-    function tick() {
-        if (video.readyState === video.HAVE_ENOUGH_DATA) {
-            canvas.height = video.videoHeight;
-            canvas.width = video.videoWidth;
-            context.drawImage(video, 0, 0, canvas.width, canvas.height);
-            const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-            const code = jsQR(imageData.data, imageData.width, imageData.height);
-            if (code) {
-                console.log("QR code detected: " + code.data);
-                parseBarcode(code.data);
-                stopScanner();
+    // function displayDetectedBarcode(code, format, parsedResult) {
+    //     const barcodeResults = document.getElementById('barcode-results');
+    //     const resultDiv = document.createElement('div');
+    //     resultDiv.innerHTML = `<strong>Detected Barcode (${format}):</strong> ${code} <br><strong>Parsed Results:</strong> <pre>${JSON.stringify(parsedResult, null, 2)}</pre>`;
+    //     barcodeResults.appendChild(resultDiv);
+    // }
+
+    const aiOptions = [
+            { label: 'GTIN/UDI', value: '01' },
+            { label: 'Batch or Lot Number', value: '10' },
+            { label: 'Production Date', value: '11' },
+            { label: 'Expiration Date', value: '17' },
+            { label: 'Unknown/Not Needed', value: 'Unknown' }
+        ];
+
+    function displayDetectedBarcode(code, format, parsedResult) {
+        const barcodeResults = document.getElementById('barcode-results');
+        const resultDiv = document.createElement('div');
+        resultDiv.classList.add('mapping-table');
+        // resultDiv.innerHTML = `<strong>Detected Barcode (${format}):</strong> ${code}`;
+
+        for (const [key, value] of Object.entries(parsedResult)) {
+            const row = document.createElement('div');
+            row.classList.add('mapping-row');
+
+            const leftCell = document.createElement('div');
+            leftCell.classList.add('mapping-cell');
+            leftCell.innerText = value;
+
+            const arrowCell = document.createElement('div');
+            arrowCell.classList.add('arrow');
+            arrowCell.innerHTML = `<i class="fa-solid fa-arrow-right"></i>`;
+
+            const rightCell = document.createElement('div');
+            rightCell.classList.add('mapping-cell');
+            const select = document.createElement('select');
+            select.classList.add('form-control');
+
+            aiOptions.forEach(option => {
+                const opt = document.createElement('option');
+                opt.value = option.value;
+                opt.innerText = option.label;
+                if (option.label === key) {
+                    opt.selected = true;
+                }
+                select.appendChild(opt);
+            });
+
+            rightCell.appendChild(select);
+            row.appendChild(leftCell);
+            row.appendChild(arrowCell);
+            row.appendChild(rightCell);
+
+            resultDiv.appendChild(row);
+        }
+
+        barcodeResults.appendChild(resultDiv);
+
+        // Save the structured data in the JSON variable
+        // structuredData.push(parsedResult);
+        // console.log('Structured Data:', JSON.stringify(structuredData, null, 2));
+    }
+
+
+    function parseQRCode(code) {
+        const sanitizedCode = code.replace(/[^ -~]+/g, ""); // Remove non-printable ASCII characters
+        const aiPatterns = {
+            "01": "GTIN",
+            "10": "Batch or Lot Number",
+            "11": "Production Date",
+            "17": "Expiration Date",
+            // Add more AI patterns as needed
+        };
+        const parsedResult = {};
+        let remainingCode = sanitizedCode;
+        while (remainingCode.length > 0) {
+            const ai = remainingCode.substring(0, 2);
+            if (aiPatterns[ai]) {
+                const field = aiPatterns[ai];
+                let length;
+                if (ai === "01") length = 14; // GTIN length
+                else if (ai === "10") length = 20; // Lot Number max length
+                else length = 6; // Dates length
+                const value = remainingCode.substring(2, 2 + length).replace(/[^0-9A-Za-z]/g, "");
+                parsedResult[field] = value;
+                remainingCode = remainingCode.substring(2 + length);
+            } else {
+                remainingCode = remainingCode.substring(2);
             }
         }
-        requestAnimationFrame(tick);
+        return parsedResult;
+    }
+
+    function parseGS1Barcode(code) {
+        const aiPatterns = {
+            "01": "GTIN",
+            "10": "Batch or Lot Number",
+            "11": "Production Date",
+            "17": "Expiration Date",
+            // Add more AI patterns as needed
+        };
+        const parsedResult = {};
+        let remainingCode = code;
+        while (remainingCode.length > 0) {
+            const ai = remainingCode.substring(0, 2);
+            if (aiPatterns[ai]) {
+                const field = aiPatterns[ai];
+                let length;
+                if (ai === "01") length = 14; // GTIN length
+                else if (ai === "10") length = 20; // Lot Number max length
+                else length = 6; // Dates length
+                const value = remainingCode.substring(2, 2 + length).replace(/[^0-9A-Za-z]/g, "");
+                parsedResult[field] = value;
+                remainingCode = remainingCode.substring(2 + length);
+            } else {
+                remainingCode = remainingCode.substring(2);
+            }
+        }
+        return parsedResult;
     }
 }
 
-function stopScanner() {
-    Quagga.stop();
-    const video = document.getElementById('video');
-    if (video.srcObject) {
-        video.srcObject.getTracks().forEach(track => track.stop());
-        video.srcObject = null;
-    }
-}
-
-function onDetected(result) {
-    console.log(`Barcode detected and processed : [${result.codeResult.code}]`, result);
-    if (currentInputId) {
-        document.getElementById(currentInputId).value = result.codeResult.code;
-        document.getElementById('scanModal').style.display = 'none';
-        currentInputId = null;
-        parseBarcode(result.codeResult.code);
-    } else {
-        parseBarcode(result.codeResult.code);
-    }
-    stopScanner();
-}
-
+// API Functions
 function parseBarcode(code) {
     fetch(`https://accessgudid.nlm.nih.gov/api/v3/parse_udi.json?udi=${code}`)
         .then(response => {

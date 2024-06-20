@@ -394,6 +394,10 @@ def category_details_view(request, category_name):
     })
 
 
+def barcode_scanner(request):
+    return render(request, 'barcode_scanner.html')
+
+
 @csrf_exempt
 def classify_device_view(request):
     device_data = json.loads(request.body)  # Parse the JSON body
