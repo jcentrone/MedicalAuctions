@@ -1118,6 +1118,12 @@ button i {
     justify-content: center;
     align-items: center;
 }
+#importExcel{
+    grid-column: span 2;
+    width: 313px;
+    align-self: center;
+    justify-self: center;
+}
 
 video{
     border-radius: var(--border-radius);

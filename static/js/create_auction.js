@@ -33,7 +33,6 @@ window.onload = () => {
 
 const options = {
     scanQRCode: 'scanModal',
-    scanIndividualBarcodes: 'scanBarcodesModal',
     importExcel: 'importModal',
     enterDetails: null // Handle Enter Details Manually option
 };
