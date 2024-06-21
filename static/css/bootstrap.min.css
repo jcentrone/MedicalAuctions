@@ -4136,7 +4136,7 @@ textarea.form-control-lg {
 }
 
 .nav-link .fas{
-    /*color: var(--bs-white);*/
+    color: var(--secondary-blue) !important;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -12029,7 +12029,9 @@ th {
 }
 
 .badge {
-    padding-top: .28rem
+    color: var(--secondary-blue);
+    border: 1px solid var(--secondary-blue);
+    border-radius: var(--border-radius);
 }
 
 .badge-pill {

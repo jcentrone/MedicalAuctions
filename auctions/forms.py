@@ -1,23 +1,28 @@
 from django import forms
 
-from .models import Auction, Bid, Comment, Image
+from .models import Auction, Bid, Comment, Image, Category
 
+from django import forms
 
 class AuctionForm(forms.ModelForm):
-    '''
-    A ModelForm class for creating a new auction listing
-    '''
-
     class Meta:
         model = Auction
-        fields = ['title', 'product_name', 'description', 'category', 'starting_bid', 'reserve_bid', 'auction_duration', 'manufacturer', 'reference_number', 'lot_number',
-                  'expiration_date', 'package_type', 'package_quantity', 'deviceSterile', 'fullPackage', 'udi', 'quantity_available', 'production_date']
+        fields = ['title', 'product_name', 'description', 'category', 'starting_bid', 'reserve_bid', 'auction_duration',
+                  'manufacturer', 'reference_number', 'lot_number', 'expiration_date', 'package_type',
+                  'package_quantity', 'deviceSterile', 'fullPackage', 'udi', 'quantity_available', 'production_date',
+                  'partial_quantity']
 
     def __init__(self, *args, **kwargs):
         super(AuctionForm, self).__init__(*args, **kwargs)
         for visible in self.visible_fields():
             visible.field.widget.attrs['class'] = 'form-control'
 
+        # Customize category field choices to show parent/child relationships
+        self.fields['category'].queryset = Category.objects.all()
+        self.fields['category'].choices = [
+            (category.id, f"{category.parent.category_name} / {category.category_name}" if category.parent else f"{category.category_name}")
+            for category in Category.objects.all().order_by('parent__category_name', 'category_name')
+        ]
 
 class ImageForm(forms.ModelForm):
     '''
@@ -31,7 +36,6 @@ class ImageForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(ImageForm, self).__init__(*args, **kwargs)
         self.visible_fields()[0].field.widget.attrs['class'] = 'form-control'
-
 
 
 class CommentForm(forms.ModelForm):

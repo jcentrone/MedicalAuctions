@@ -56,17 +56,25 @@
         Categories
     </div>
 
-    {% for category in categories %}
-        <li class='nav-item'>
-            <a class='nav-link' href="{% url 'category_details_view' category.category_name %}">
-                <i class='fas fa-fw fa-folder-open'></i>
-                <span class='text-uppercase'>{{ category }}</span>
-                <span class='badge-custom'>
-                    {{ category.count_active_auctions }}
-                </span>
-            </a>
-        </li>
-    {% endfor %}
+{#    {% for category in categories %}#}
+{#        <li class='nav-item'>#}
+{#            <a class='nav-link' href="{% url 'category_details_view' category.category_name %}">#}
+{#                <i class='fas fa-fw fa-folder-open'></i>#}
+{#                <span class='text-uppercase'>{{ category }}</span>#}
+{#                <span class='badge-custom'>#}
+{#                    {{ category.count_active_auctions }}#}
+{#                </span>#}
+{#            </a>#}
+{#        </li>#}
+{#    {% endfor %}#}
+
+    <ul>
+        {% for category in categories %}
+            {% if not category.parent %}
+                {% include 'category_snippet.html' with category=category %}
+            {% endif %}
+        {% endfor %}
+    </ul>
 
     <!-- Divider -->
     <hr class='sidebar-divider d-none d-md-block'>
@@ -93,3 +101,14 @@
 
 </ul>
 <!-- End of Sidebar -->
+{#<script>#}
+{#    document.querySelectorAll('.nav-item > a').forEach(item => {#}
+{#    item.addEventListener('click', function(e) {#}
+{#        e.preventDefault();#}
+{#        let nextUl = this.nextElementSibling;#}
+{#        if (nextUl && nextUl.tagName === 'UL') {#}
+{#            nextUl.style.display = nextUl.style.display === 'none' ? 'block' : 'none';#}
+{#        }#}
+{#    });#}
+{#});#}
+{#</script>#}

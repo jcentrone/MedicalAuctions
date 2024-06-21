@@ -17,6 +17,7 @@ document.getElementById('id_form-0-image').addEventListener('change', () => {
     readURL(document.getElementById('id_form-0-image'), 'main-thumbnail-preview', 'main-upload-icon');
 });
 
+
 // Attach event listeners to all image upload inputs
 document.querySelectorAll('input[type="file"][id^="id_form-"]').forEach((input) => {
     const index = input.id.match(/\d+/)[0]; // Extract the index from the input ID
@@ -25,11 +26,51 @@ document.querySelectorAll('input[type="file"][id^="id_form-"]').forEach((input) 
     });
 });
 
+document.querySelectorAll('.scan-control').forEach((input) => {
+    // Extract the index from the input ID
+    input.addEventListener('click', () => {
+        startScanner();
+        document.getElementById('scanModal').style.display = 'block';
+
+    });
+});
+
 
 window.onload = () => {
     document.getElementById('optionModal').style.display = 'block';
     // document.getElementById('optionModal').style.display = 'none';
 };
+
+document.getElementById('id_fullPackage').addEventListener('change', (event) => {
+    let partialQty = document.getElementById('partial-qty');
+    let auctionQty = document.getElementById('id_quantity_available');
+
+    if (event.target.checked) {
+        partialQty.style.visibility = 'hidden';
+        auctionQty.disabled = false;
+
+    } else {
+        partialQty.style.visibility = 'visible';
+        auctionQty.value = 1;
+        auctionQty.disabled = true;
+    }
+});
+
+document.getElementById('id_quantity_available').addEventListener('change', (event) => {
+    let partialQty = document.getElementById('partial-qty');
+    let fullPkgEl = document.getElementById('id_fullPackage');
+
+
+    if (event.target.value > 1) {
+        partialQty.style.visibility = 'hidden';
+        fullPkgEl.checked = true;
+    } else {
+        partialQty.style.visibility = 'visible';
+        fullPkgEl.checked = false;
+
+    }
+});
+
 
 const options = {
     scanQRCode: 'scanModal',
@@ -167,10 +208,9 @@ function startScanner() {
             const rightCell = document.createElement('div');
             rightCell.classList.add('mapping-cell');
             let formattedDate;
-            if (key === 'Production Date' || key === 'Expiration Date'){
+            if (key === 'Production Date' || key === 'Expiration Date') {
                 formattedDate = convertDate(value);
-            }
-            else{
+            } else {
                 formattedDate = value;
             }
             rightCell.innerText = formattedDate;
@@ -305,22 +345,24 @@ function stopScanner() {
 
 // API Functions
 function parseBarcode(code) {
-    fetch(`https://accessgudid.nlm.nih.gov/api/v3/parse_udi.json?udi=${code}`)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log("Device data from AccessGUDID:", data);
+    if (code) {
+        fetch(`https://accessgudid.nlm.nih.gov/api/v3/parse_udi.json?udi=${code}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log("Device data from AccessGUDID:", data);
 
 
-            fetchDeviceData(data.udi);
+                fetchDeviceData(data.udi);
 
-            // populateForm(data);
-        })
-        .catch(error => console.error('Error fetching device data:', error));
+                // populateForm(data);
+            })
+            .catch(error => console.error('Error fetching device data:', error));
+    }
 }
 
 function fetchDeviceData(code) {
@@ -341,12 +383,7 @@ function fetchDeviceData(code) {
 
 function fetchClassificationData(code) {
     fetch(`https://api.fda.gov/device/classification.json?search=product_code:${code}&limit=5`)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
+        .then(response => response.json())
         .then(data => {
             console.log("Device data from AccessGUDID Classification:", data);
 
@@ -355,27 +392,50 @@ function fetchClassificationData(code) {
                 device_class: data.results[0].device_class,
                 device_name: data.results[0].device_name
             };
-            console.log("Classification Date:", classificationData);
+            console.log("Classification Data:", classificationData);
 
-            // Send classification data to the server to create or update categories
-            fetch('/api/classify-device/', {
+            return fetch('/api/classify-device/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRFToken': getCsrfToken()  // Function to get CSRF token
                 },
                 body: JSON.stringify(classificationData)
-            })
-                .then(response => response.json())
-                .then(result => {
-                    console.log('Device classified and category saved:', result);
-                })
-                .catch(error => console.error('Error classifying device:', error));
-
-            // populateForm(data);
+            });
         })
-        .catch(error => console.error('Error fetching device data:', error));
+        .then(response => response.json())
+        .then(result => {
+            console.log(result);
+            updateCategoryDropdown(result);
+        })
+        .catch(error => console.error('Error in processing:', error));
 }
+
+function updateCategoryDropdown(result) {
+    const selectElement = document.getElementById('id_category');
+    const parsedResult = result.category; // Ensure this parsing matches the actual response structure
+    // console.log(parsedResult);
+
+    const newValue = parsedResult.value;
+    const newText = parsedResult.category_name;
+
+    let optionExists = Array.from(selectElement.options).some(option => {
+        if (option.value === newValue || option.textContent === newText) {
+            option.selected = true; // Select if it exists
+            return true;
+        }
+        return false;
+    });
+
+    if (!optionExists) {
+        const newOption = document.createElement('option');
+        newOption.value = newValue;
+        newOption.textContent = newText;
+        newOption.selected = true;
+        selectElement.appendChild(newOption);
+    }
+}
+
 
 function getCsrfToken() {
     return document.querySelector('meta[name="csrf-token"]').getAttribute('content');
@@ -405,6 +465,7 @@ function populateForm(data) {
         }
 
 
+        document.getElementById('id_title').value = device.brandName + " - " + device.deviceDescription;
         document.getElementById('id_package_type').value = packageType;
         document.getElementById('id_package_quantity').value = packageQuantity;
         document.getElementById('id_deviceSterile').checked = device.sterilization.deviceSterile || false;
@@ -479,18 +540,36 @@ function formatDate(excelDate) {
 }
 
 function convertDate(dateString) {
-    // Extract components from the input string
-    const year = dateString.substring(0, 2);
-    const month = dateString.substring(2, 4);
-    const day = dateString.substring(4, 6);
 
-    // Convert the year to YYYY format
-    const fullYear = `20${year}`;
+    let formattedDate;
 
-    // Format the date as MM/DD/YYYY
-    const formattedDate = `${month}/${day}/${fullYear}`;
+    if (dateString.length === 6) {
+        // Extract components from the input string
+        const year = dateString.substring(0, 2);
+        const month = dateString.substring(2, 4);
+        const day = dateString.substring(4, 6);
 
-    return formattedDate;
+        // Convert the year to YYYY format
+        const fullYear = `20${year}`;
+
+        // Format the date as MM/DD/YYYY
+        formattedDate = `${month}/${day}/${fullYear}`;
+
+        return formattedDate;
+    } else if (dateString.length === 8) {
+        // Extract components from the input string
+        const year = dateString.substring(0, 4);
+        const month = dateString.substring(4, 6);
+        const day = dateString.substring(6, 8);
+
+
+        // Format the date as MM/DD/YYYY
+        formattedDate = `${month}/${day}/${year}`;
+
+        return formattedDate;
+    }
+
+
 }
 
 function generateMappingTable(data) {
@@ -556,7 +635,7 @@ document.querySelectorAll('[id^="scanButton-"]').forEach(button => {
 
 
 // Event listener for the Save button
-document.getElementById('closeScanModal').addEventListener('click', function() {
+document.getElementById('closeScanModal').addEventListener('click', function () {
     transferDataToAuctionForm();
 });
 
@@ -594,15 +673,31 @@ function transferDataToAuctionForm() {
         if (fieldId) {
             let field = document.getElementById(fieldId);
 
-            if (fieldId === 'id_udi'){
-                // parseBarcode('01' + value);
+            if (fieldId === 'id_udi') {
+                parseBarcode('01' + value);
                 field.value = '01' + value;
-            }
-            else{
+            } else if (fieldId === 'id_production_date' || fieldId === 'id_expiration_date') {
+                if (!value.includes("/")) {
+                    field.value = convertDate(value);
+                } else {
+                    field.value = value;
+                }
+            } else {
                 field.value = value;
             }
-            stopScanner();
-            document.getElementById('scanModal').style.display = 'none';
+
+
         }
     }
+    stopScanner();
+    document.getElementById('scanModal').style.display = 'none';
 }
+
+document.getElementById('infoIcon').addEventListener('mouseover', function () {
+    document.querySelector('.tooltip').style.visibility = 'visible';
+    document.querySelector('.tooltip').style.opacity = 1;
+});
+document.getElementById('infoIcon').addEventListener('mouseout', function () {
+    document.querySelector('.tooltip').style.visibility = 'hidden';
+    document.querySelector('.tooltip').style.opacity = 0;
+});

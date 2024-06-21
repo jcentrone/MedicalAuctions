@@ -1,3 +1,5 @@
+import json
+
 from auctions.models import Category
 
 
@@ -28,3 +30,25 @@ def classify_and_save_device(device_data):
     category = get_or_create_category(category_path)
 
     return category
+
+
+def update_categories_from_fda(fda_data):
+    specialty = fda_data.get('medical_specialty_description', None)
+    if specialty:
+        parent_category, parent_created = Category.objects.get_or_create(
+            category_name=specialty,
+            parent=None  # Top-level category
+        )
+        device_name = fda_data.get('device_name', None)
+        if device_name:
+            device_category, device_created = Category.objects.get_or_create(
+                category_name=device_name,
+                parent=parent_category
+            )
+            # Now you can return the ID of the device category
+            return {
+                "category_name": f"{parent_category.category_name} / {device_name}",
+                "value": device_category.id  # ID of the child category
+            }
+
+    return None

@@ -13,7 +13,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 from .forms import AuctionForm, ImageForm, CommentForm, BidForm
 from .models import Auction, Bid, Category, Image, User
-from .utils.helpers import classify_and_save_device
+from .utils.helpers import classify_and_save_device, update_categories_from_fda
 
 
 def index(request):
@@ -400,16 +400,16 @@ def barcode_scanner(request):
 
 @csrf_exempt
 def classify_device_view(request):
-    device_data = json.loads(request.body)  # Parse the JSON body
-    print(device_data)
-    # if request.method == 'POST':
-    #     try:
-    #         device_data = json.loads(request.body)  # Parse the JSON body
-    #         print(device_data)
-    #         category = classify_and_save_device(device_data)
-    #         return JsonResponse({'category': str(category)}, status=201)
-    #     except json.JSONDecodeError:
-    #         return JsonResponse({'error': 'Invalid JSON'}, status=400)
-    #     except Exception as e:
-    #         return JsonResponse({'error': str(e)}, status=500)
-    # return JsonResponse({'error': 'Invalid request'}, status=400)
+    # device_data = json.loads(request.body)  # Parse the JSON body
+    # print(request)
+    if request.method == 'POST':
+        try:
+            device_data = json.loads(request.body)  # Parse the JSON body
+            print(device_data)
+            category = update_categories_from_fda(device_data)
+            return JsonResponse({'category': category}, status=201)
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON'}, status=400)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+    return JsonResponse({'error': 'Invalid request'}, status=400)

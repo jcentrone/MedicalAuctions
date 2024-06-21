@@ -40,7 +40,7 @@ class Auction(models.Model):
     creator = models.ForeignKey(User, on_delete=models.PROTECT, related_name='auction_creator')
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='auction_category')
     date_created = models.DateTimeField(default=timezone.now)
-    quantity_available = models.IntegerField('Quantity Available', null=True, blank=True)
+    quantity_available = models.IntegerField('Auction Quantity', null=True, blank=True)
     starting_bid = models.DecimalField(
         max_digits=7,
         decimal_places=2,
@@ -65,6 +65,7 @@ class Auction(models.Model):
     active = models.BooleanField(default=True)
     product_name = models.CharField('Product Name', max_length=256, null=True, blank=True)
     package_quantity = models.IntegerField(null=True, blank=True)
+    partial_quantity = models.IntegerField(null=True, blank=True)
     manufacturer = models.CharField(max_length=100, null=True, blank=True)
     reference_number = models.CharField(max_length=100, null=True, blank=True)
     lot_number = models.CharField(max_length=100, null=True, blank=True)
